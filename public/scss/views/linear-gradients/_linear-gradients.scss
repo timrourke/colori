@@ -1,0 +1,26 @@
+.gradient-string {
+  position:absolute;
+  top:50%;
+  left:50%;
+  width:100%;
+  max-width:30em;
+  height:100%;
+  max-height:20em;
+  transform:translateX(-50%) translateY(-1000px) scale(0);
+  transition:transform 0.7s ease-in-out;
+  font-size:0.8em;
+  font-family: Consolas, monaco, 'Courier New', courier, monospace;
+  z-index:400;
+}
+
+.gradient-string.gradient-string--open {
+	transform:translateX(-50%) translateY(-50%) scale(1);
+}
+
+.gradient-string-toggle.gradient-string--open {
+	border:1px solid #00FC6B;
+}
+
+.gradient-string-toggle.gradient-string--open svg {
+	fill:#00FC6B;
+}

@@ -1,0 +1,26 @@
+<section class="gradients">
+  <div class="gradients-grid col-group">
+  	<header class="gradients-grid__header">
+  		<nav class="gradients-grid__nav">
+  			<span class="gradients-grid__nav-title">Showing all gradients.</span>
+  			<form class="gradients-grid__nav-sort">
+  				<label>
+  					Sort by:
+  					<div class="gradients-grid__nav-select select">
+						  <select ng-model="sortOrder">
+						    <option value="-posted">most recent.</option>
+						    <option value="-hearts" selected>most popular.</option>
+						    <option value="-comments">comments.</option>
+						  </select>
+						</div>
+  				</label>
+  			</form>
+  		</nav>
+  	</header>
+  	<div class="gradients-grid__gradients col-group">
+  		<div ng-repeat="gradientItem in gradientItems | orderBy:sortOrder">
+  			<gradient-item author="gradientItem.author" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.comments" gradient="gradientItem.gradient"></gradient-item>
+  		</div>
+  	</div>
+  </div>
+</section>

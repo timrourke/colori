@@ -1,0 +1,5 @@
+<h2>Users</h2>
+<ul ng-if="users.length" ng-repeat="user in users">
+	<li><a ui-sref="users.detail({ username: user.username })">{{user.username}}</a></li>
+</ul>
+<div ui-view></div>

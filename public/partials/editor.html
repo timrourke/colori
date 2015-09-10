@@ -1,0 +1,29 @@
+<section class="gradient-editor">
+  <nav class="tools">
+    <add-gradient-picker></add-gradient-picker>
+    <button class="gradient-string-toggle" ng-click="toggleCss()" ng-class="{'gradient-string--open': showCss, 'gradient-string--close': !showCss}">
+      <svg class="icon" viewBox="0 0 600 600">
+        <use xlink:href="#code" />
+      </svg>
+    </button>  
+  </nav>
+  
+  <div class="wrapper gradient-wrapper">
+    <style>
+      .gradient {
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        {{gradientCssString}}
+        z-index:-1;
+      }
+    </style>
+
+    <textarea class="gradient-string" ng-class="{'gradient-string--open': showCss, 'gradient-string--close': !showCss}">{{gradientCssString}}</textarea>
+
+    <div class="gradient"></div>
+  </div>
+</section>
+  

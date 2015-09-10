@@ -1,0 +1,128 @@
+.gradients {
+	background-color:$background-color;
+}
+
+.gradients-grid {
+	width:100%;
+	padding:1em;
+	margin:2em auto;
+	max-width:50em;
+}
+
+.gradients-grid__nav {
+	@extend .clearfix;
+	position:relative;
+	z-index:1;
+	&::before {
+		position:absolute;
+		display:block;
+		content:'';
+		bottom:1.75em;
+		left:0;
+		width:100%;
+		height:0.05em;
+		background-image:$gradient-parakeet;
+	}
+}
+
+.gradients-grid__nav-title {
+	float:left;
+}
+
+.gradients-grid__nav-sort {
+	background-color:transparent;
+	padding:0;
+	float:right;
+}
+
+.gradients-grid__nav-select {
+	color:$blue;
+	margin:0;
+	float:right;
+	height:1.5em;
+	& select {
+		color:$blue;
+		padding:0 0.5em .25em 0.25em;
+		margin-right:0;
+		font-size:1em;
+		background-color:transparent;
+	}
+	&:after, 
+	&::after {
+		right:0;
+		border-top: .25em solid;
+    border-right: .25em solid transparent;
+    border-bottom: .25em solid transparent;
+    border-left: .25em solid transparent;
+	}
+}
+
+.gradients-grid__gradients {
+	@include layout(12 0.25 split);
+}
+
+.gradientItem {
+	@include span(4 of 12);
+	overflow:hidden;
+	position:relative;
+	height:0;
+	padding:1px 1px 20% 1px;
+	background-color:rgba(0,0,0,0.2);
+	box-shadow: 0 3px 7px rgba(0,0,0,0.125);
+	border:0.075em solid rgba(0,0,0,0.1);
+	border-radius:10px/10px;
+	margin-bottom:1em;
+	z-index:1;
+}
+
+.gradientItem .gradient__gradient {
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background-repeat:no-repeat;
+	border-bottom:1.75em inset transparent;
+	box-shadow:inset 0 0 3px rgba(0,0,0,0.5);
+}
+
+.gradientItem .gradient__footer {
+	@extend .clearfix;
+	position:absolute;
+	bottom:0;
+	left:0;
+	width:100%;
+	height:2em;
+	font-size:0.8em;
+	color:$lightgrey;
+	padding:0 0.5em;
+}
+
+.gradient__footer .gradient__author {
+	float:left;
+	height:2em;
+	line-height: 2em;
+}
+
+.gradientItem .gradient__meta {
+	float:right;
+	height:2em;
+}
+
+.gradient__meta span {
+	position:relative;
+	padding-left:1.625em;
+	line-height:2em;
+	margin-right:0.125em;
+}
+
+.gradient__footer .icon {
+	position:absolute;
+	top:-.1125em;
+	left:0;
+	width:1.5em;
+	fill:transparent;
+	stroke:$lightgrey;
+	stroke-width:2px;
+	padding:2px;
+}

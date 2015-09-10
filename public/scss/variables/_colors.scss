@@ -1,0 +1,19 @@
+$softgrey:rgb(55,60,70);
+$lightgrey:rgb(117,122,141);
+$blue:      rgb(96,187,255);
+
+$neutral-input-color: #222;
+$confirm-input-color: #00FF68;
+$active-input-color: #35C2EF;
+
+$color__link: $blue;
+$color__link-hover: saturate(lighten($blue, 10%), 80%);
+$color__link-visited: $blue;
+
+$background-color:$softgrey;
+
+$gradient-parakeet:linear-gradient(to right,
+	rgb(233, 102, 44),
+	lighten(desaturate(rgb(235, 175,60), 5%), 5%) 30%,
+	rgb(0, 172, 101) 80%,
+	rgb(6, 136, 148));

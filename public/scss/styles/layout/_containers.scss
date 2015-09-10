@@ -1,0 +1,39 @@
+html {
+  transition:all 0.5s ease-in-out;
+}
+
+//Clean sticky footer
+html, body {
+  height:100%;
+}
+
+main {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:100;
+}
+
+.site-wrapper {
+  position:relative;
+  min-height:100%;
+  height:auto !important;
+  height:100%;
+  overflow:hidden;
+}
+
+.wrapper {
+  position:absolute;
+  display:block;
+  width:100%;
+  height:100%;
+  top:0;
+  left:0;
+}
+
+section {
+  padding:2.5em 0.5em 2em 0.5em;
+  height:100%;
+}

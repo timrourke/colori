@@ -1,0 +1,22 @@
+.site-header {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:u(2.5rem);
+  background-color:rgba(0,0,0,0.2);
+  box-shadow: 0 3px 7px rgba(0,0,0,0.125);
+  padding-left:u(1rem);
+  overflow:hidden;
+  z-index:200;
+}
+
+.site-title {
+  @extend .typl8-gamma;
+  margin-top:0.25em;
+  color:white;
+  font-weight: 300;
+  display:block;
+  width:6em;
+  float:left;
+}

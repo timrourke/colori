@@ -1,0 +1,11 @@
+%hover-fill-blue {
+  &:hover {
+    fill:saturate(lighten($blue, 10%), 80%);
+  }
+}
+
+%hover-color-blue {
+  &:hover {
+    color:saturate(lighten($blue, 10%), 80%);
+  }
+}

@@ -1,0 +1,21 @@
+.gradient-editor .tools {
+	width:3em;
+}
+
+.gradient-editor .tools button {
+	position:relative;
+  border-radius:50%;
+  margin:0 0.25em;
+  height:0;
+  width:100%;
+  padding-bottom:100%;
+  z-index:1000;
+  .icon {
+		position:absolute;
+		top:0;
+		left:0;
+		width:100%;
+		height:100%;
+		padding:0.25em;
+  }
+}
