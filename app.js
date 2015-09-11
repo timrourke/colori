@@ -31,7 +31,7 @@ var sequelize = new Sequelize('colori', 'timrourke-wdi', '', {
 
 // Define Models
 var Models = require(path.join(__dirname, 'models', 'models.js'))(sequelize, Sequelize);
-
+sequelize.sync();
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));

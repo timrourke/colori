@@ -132,8 +132,6 @@ module.exports = function(sequelize, Sequelize) {
 	Comment.belongsTo(Gradient);
 	Comment.hasMany(Comment);
 
-	sequelize.sync({ force: true });
-
 	/*
 	 * Use the pattern defined below to create associations.
 	 *

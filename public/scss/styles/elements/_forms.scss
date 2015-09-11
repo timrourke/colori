@@ -72,7 +72,8 @@ input[type="text"],
 input[type="email"],
 input[type="url"],
 input[type="password"],
-input[type="search"] {
+input[type="search"],
+input[type="number"] {
   position:relative;
   height:u(2.5rem);
   border:0;
@@ -81,10 +82,13 @@ input[type="search"] {
   margin: $typl8-indent-val/2 auto;
   padding:0 0.5em;
   font-size:1em;
-  border: u(.075rem) solid #ddd;
+  border: 2px solid $purple;
+  background-color:$lightgrey;
+  box-shadow:inset 0 0 7px rgba(0,0,0,0.5);
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
+  transition:border 0.3s ease-in-out;
 }
 
 .js {
@@ -96,9 +100,20 @@ input[type="search"] {
   }
 }
 
+input,
+select,
+option,
+button,
+textarea {
+  &:focus {
+    outline:0;
+    border:2px solid $blue;
+  }
+}
+
 form {
   @extend .clearfix;
-  background-color:#f5f5f5;
+  background-color:rga(0,0,0,0.2);
   padding:1em;
   margin-bottom: $typl8-indent-val;
 }
@@ -142,31 +157,56 @@ textarea {
   }
 }
 
+label {
+  color:$lightgrey;
+}
+
 label.control,
 .select,
 .file {
   margin-right:0.5em;
 }
 
+$placeholder-color:$softgrey;
+
+::-webkit-input-placeholder {
+  color: $placeholder-color;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: $placeholder-color;
+}
+:-ms-input-placeholder {
+  color: $placeholder-color;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: $placeholder-color;
+}
+::placeholder {
+  color: $placeholder-color;
+}
+:placeholder {
+  color: $placeholder-color;
+}
+
 input[type="submit"],
 button,
 .button {
-font-size:1em;
-  font-weight:700;
-  text-transform:uppercase;
+  @extend %typl8-ot--smcp;
+  font-size:1em;
+  font-weight:400;
+  text-transform:lowercase;
   height:u(2.5rem);
   margin: $typl8-indent-val/2 auto;
-  padding:0 1em;
+  padding:0 1.25em 0 1.25em;
   display: inline-block;
-  background-color: #eee;
-  border: 0;
-  box-shadow:0 0 u(.15rem) u(-0.1rem) saturate(teal, 50%);
+  background-color:rgba(0,0,0,0.4);
+  border: 2px solid black;
   border-radius:0;
   cursor: pointer;
   -webkit-appearance: none;
      -moz-appearance: none;
           appearance: none;
-  color:#666;
+  color:$blue;
   transition:all 0.3s ease-in-out;
   overflow:hidden;
   &:hover {
@@ -183,31 +223,16 @@ font-size:1em;
   fill:rgba(255,255,255,0.25);
 }
 
-button,
-.button {
-  background-image:linear-gradient(to bottom, $neutral-input-color, darken($neutral-input-color, 20%) 95%);
-  border: u(.075rem) solid darken($neutral-input-color, 20%);
-  &.button--glass {
-    background-image:linear-gradient(to bottom, lighten($neutral-input-color, 20%), lighten($neutral-input-color, 40%) 95%);
-    border: u(.075rem) solid green;
-  }
-}
-
 input[type="submit"] {
-  background-image:linear-gradient(to bottom, $confirm-input-color, darken($confirm-input-color, 15%) 95%);
-  border: u(.075rem) solid darken($confirm-input-color, 15%);
-  &:hover {
-    color:white;
-  }
+  color:$green;  
 }
 
 input[type="submit"],
 button {
   &:disabled {
     color:#777;
-    background-color: #eee;
-    background-image:none;
-    border: u(.075rem) solid #ddd;
+    background-color: rgba(50,50,50,0.8);
+    border: 2px solid #222;
     cursor: default;
   }
 }

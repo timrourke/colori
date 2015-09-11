@@ -7,7 +7,14 @@ var debug       = require('debug')('app:userUtils:' + process.pid),
     config      = require(path.join(__dirname, '..', 'config', 'config')),
     tokenUtils  = require(path.join(__dirname, '/tokenUtils.js'));
 
-module.exports.createUserProfile = function (user, req, res, next) {
+module.exports.createUserProfile = function (Models, user, req, res, next) {
+
+    console.log('Beginning user profile creation');
+
+    var User = Models.User;
+    var UserProfile = Models.UserProfile;
+    var Gradient = Models.Gradient;
+    var Comment = Models.Comment;
 
     debug("Create user profile");
 
@@ -15,19 +22,26 @@ module.exports.createUserProfile = function (user, req, res, next) {
         return next(new Error('User data cannot be empty.'));
     }
 
-    var newUserProfile = new UserProfile({});
+    UserProfile.create({}).then(function(newUserProfile){
 
-    newUserProfile._creator = user;
+        if (!newUserProfile || newUserProfile.length == 0) {
+            return next(err);
+        } else {
+            newUserProfile.setUser(user).then(function(assignedNewUserProfile){
+                console.log("User profile generated for user: %s", user.username);
 
-    newUserProfile.save(function(err) {
-        if (err) {
-            return next(new Error(err));
+                debug("User profile generated for user: %s", user.username);
+
+                tokenUtils.create(user, req, res, next);
+            }).catch(function(err){
+                console.log(err);
+                return next(err);
+            });
         }
 
-        debug("User profile generated for user: %s", user.username);
-
-        tokenUtils.create(user, req, res, next);
-
+    }).catch(function(err){
+        console.log(err);
+        next(err);
     });
 
 };

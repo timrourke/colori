@@ -1,6 +1,22 @@
-<h2>Log In</h2>
-<form ng-submit="login(loginCredentials)">
-	<input type="text" ng-model="loginCredentials.username">
-	<input type="password" ng-model="loginCredentials.password">
-	<input type="submit">
-</form>
+<section class="login">
+	<form ng-submit="login(loginCredentials)">
+		<div class="row">
+		  <svg class="login__avatar" viewBox="0 0 600 600">
+        <use xlink:href="#anonymous_user" />
+      </svg>
+			<h3>Log In</h3>	
+		</div>
+
+		<label for="loginCredentials__username">
+			Username
+			<input type="text" id="loginCredentials__username" ng-model="loginCredentials.username" placeholder="Username">	
+		</label>
+		
+		<label for="loginCredentials__password">
+			Password
+			<input type="password" id="loginCredentials__password" ng-model="loginCredentials.password">	
+		</label>
+		
+		<input type="submit">
+	</form>	
+</section>

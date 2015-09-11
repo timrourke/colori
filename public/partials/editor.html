@@ -1,5 +1,10 @@
 <section class="gradient-editor">
   <nav class="tools">
+    <button class="gradient-editor__save-gradient" type="button" ng-click="saveGradient()">
+      <svg class="icon" viewBox="0 0 600 600">
+        <use xlink:href="#save" />
+      </svg>
+    </button>
     <add-gradient-picker></add-gradient-picker>
     <button class="gradient-string-toggle" ng-click="toggleCss()" ng-class="{'gradient-string--open': showCss, 'gradient-string--close': !showCss}">
       <svg class="icon" viewBox="0 0 600 600">

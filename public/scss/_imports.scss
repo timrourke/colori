@@ -61,6 +61,7 @@ $susy: (
 //Views.
 @import 'views/header';
 @import 'views/footer';
+	@import 'views/auth/auth';
 	//Linear gradients.
 	@import 'views/linear-gradients/linear-gradients';
 	@import 'views/gradients-grid/gradients-grid';

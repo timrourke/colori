@@ -1,0 +1,43 @@
+.login,
+.signup {
+	background-color:$background-color;
+}
+
+.login .login__avatar,
+.signup .login__avatar {
+	width:1.75em;
+	height:1.75em;
+	float:left;
+	margin:0.325em 0.25em 0 0;
+	fill:$softgrey;
+}
+
+.login form,
+.signup form {
+	border-radius:10px;
+	padding:1em;
+	margin:2em auto;
+	width:100%;
+	max-width:310px;
+	background-color:rgba(0,0,0,0.2);
+	border: .075em solid rgba(0,0,0,.1);
+}
+
+.login form h3,
+.signup form h3 {
+	color:$blue;
+}
+
+.login form input,
+.signup form input {
+	width:100%;
+	margin-top:0.125em;
+	margin-bottom:$typl8-indent-val;
+}
+
+.login form input[type="submit"],
+.signup form input[type="submit"] {
+	display:block;
+	margin:$typl8-indent-val/4 auto;
+	max-width:8em;
+}

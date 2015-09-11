@@ -44,14 +44,12 @@ module.exports.create = function (user, req, res, next) {
         return next(new Error('User data cannot be empty.'));
     }
 
-    var data = {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        token: jsonwebtoken.sign({ id: user.id }, config.secret, {
-            expiresInMinutes: TOKEN_EXPIRATION
-        })
-    };
+    //Omit sensitive user info from response.
+    var data = _.omit(user.dataValues, 'password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid');
+
+    data.token = jsonwebtoken.sign({ id: user.id }, config.secret, {
+        expiresInMinutes: TOKEN_EXPIRATION
+    });
 
     var decoded = jsonwebtoken.decode(data.token);
 
@@ -71,6 +69,7 @@ module.exports.create = function (user, req, res, next) {
                     return next(new Error("Can not set the expire value for the token key"));
                 }
                 if (reply) {
+                    data.message = "Welcome back, " + data.username + "!"; 
                     req.user = data;
                     next(); // we have succeeded
                 } else {

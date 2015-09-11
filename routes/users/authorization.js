@@ -6,8 +6,8 @@ var debug = require('debug')('app:routes:authorization' + process.pid),
     path = require('path'),
     async = require('async'),
     bcrypt = require('bcryptjs'),
-    tokenUtils = require(path.join(__dirname, '..', '..', 'utils', '/tokenUtils.js')),
-    userUtils = require(path.join(__dirname, '..', '..', 'utils', '/userUtils.js')),
+    tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils')),
+    userUtils = require(path.join(__dirname, '..', '..', 'utils', 'userUtils')),
     Router = require("express").Router,
     UnauthorizedAccessError = require(path.join(__dirname, '..', '..', 'errors', 'UnauthorizedAccessError.js'));
 
@@ -34,8 +34,10 @@ module.exports = function (Models) {
     process.nextTick(function () {
 
       User.findOne({
-          where: {username: username}
+          where: {username: username},
+          include: [{ model: UserProfile }]
       }).then(function (user) {  
+        console.log(user);
 
         if (!user || user.length == 0) {
           return next(new UnauthorizedAccessError("401", {
@@ -95,16 +97,13 @@ module.exports = function (Models) {
             res.status(400).json({ success:false, message: 'Signup failed. Username taken. Please try another username.' });
         } else if (!user || user.length == 0) {
 
-          var successNewUser = User.build(newUser);
-
-          successNewUser.save().then(function(user) {
+          User.create(newUser).then(function(user) {
             console.log('User saved successfully with ID of ' + user.id);
 
-            delete user['password'];
-
-            userUtils.createUserProfile(user, req, res, next);
+            userUtils.createUserProfile(Models, user, req, res, next);
           }).catch(function(err){
             //Failed to save to database.
+            console.log(err);
             next(err);
           });
 

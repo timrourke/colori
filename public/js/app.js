@@ -51,7 +51,7 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 	    state('login', {
 	      url: '/login',
 	      templateUrl: '/partials/login.html',
-	      controller: 'MainController'
+	      controller: 'LoginController'
 	    }).
 	    state('signup', {
 	      url: '/signup',
@@ -125,7 +125,8 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 	    successAuth: function(res) {
 	      $localStorage.id_token = res.user.token;
 	      $localStorage.user = res.user;
-	      $rootScope.message = res.message;
+	      $rootScope.message = res.user.message;
+	      $location.path('/');
 	    }
 	  };
 
@@ -200,11 +201,7 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 
 		$scope.increasePickerCount = gradientRegister.increasePickerCount;
 
-		getGradientCssString = function() {
-			var result = 'background:';
-			
-			var gradients = gradientRegister.getGradients();
-
+		var sortGradientsByPositionLeft = function(gradients) {
 			var sortedGradients = [];
 
 			//Sort gradient stops by how far left they are. Allows
@@ -214,7 +211,13 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 				sortedGradients.push(value);
 			});
 
-			gradients = sortedGradients;
+			return sortedGradients;
+		}
+
+		var getGradientCssString = function() {
+			var gradients = sortGradientsByPositionLeft(gradientRegister.getGradients());
+
+			var result = 'background:';
 
 			//If we have liear gradient stops in our service, 
 			//build a css string for our inline style block.
@@ -252,6 +255,11 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 			function(newValue, oldValue){
 				$scope.gradientCssString = getGradientCssString();			
 			});
+
+		$scope.saveGradient = function(){
+			var test = sortGradientsByPositionLeft(gradientRegister.getGradients());
+			console.log(test);
+		}
 
 	}])
 	.controller('gradientGridController', ['$scope', function($scope) {
@@ -337,8 +345,8 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 		}
 	}
 }])
-.controller('MainController', ['$rootScope', '$scope', '$location', '$localStorage', 'Auth', 
-  function MainController($rootScope, $scope, $location, $localStorage, Auth) {
+.controller('LoginController', ['$rootScope', '$scope', '$location', '$localStorage', 'Auth', 
+  function LoginController($rootScope, $scope, $location, $localStorage, Auth) {
 
     $scope.$watch(function(scope){
       return Auth.getUser()

@@ -5,7 +5,8 @@ var debug = require('debug')('app:routes:gradients' + process.pid),
     util = require('util'),
     path = require('path'),
     async = require('async'),
-    Router = require("express").Router;
+    Router = require("express").Router,
+    tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils'));
 
 module.exports = function (Models) {
 
