@@ -1,0 +1,17 @@
+.gradient-editor__wrapper {
+	position:absolute;
+	top:2.5em;
+	left:0;
+	width:100%;
+	height:100%;
+	z-index:1000;
+}
+
+.gradient-wrapper {
+	border:1px solid #222;
+	box-shadow:inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+.gradient-editor {
+	transition:transform 0.3s ease-in-out;
+}

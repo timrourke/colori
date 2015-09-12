@@ -1,8 +1,11 @@
 .gradient-editor .tools {
-	width:3em;
+	width:2em;
+	height:2em;
 }
 
 .gradient-editor .tools button {
+	background-color:transparent;
+	border:none;
 	position:relative;
   border-radius:50%;
   margin:0 0.25em;

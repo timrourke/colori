@@ -45,11 +45,74 @@ module.exports = function (Models) {
       if (!gradient) {
         res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
       } else {
+
+        gradient.User.dataValues = _.omit(gradient.User.dataValues, ['password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid']);
+
+        console.log(gradient.User);
+
         res.status(200).json({
           success: true,
           message: '1 gradient found.',
           gradientFound: gradient
         }); 
+      }
+
+    }).catch(function(err) {
+      console.log(err);
+      return next(err);
+    });
+  });
+
+  router.route('/:permalink/comment').post(function(req, res, next) {
+    Gradient.findOne({ where: { permalink: req.params.permalink }, include: [{ model: User }, { model: Comment }] }).then(function(gradient) {
+
+      if (!gradient) {
+        res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
+      } else {
+
+        User.findOne({ where: { id: req.user.id } }).then(function(author){
+
+          if (!author){
+
+            return next(new UnauthorizedAccessError("invalid_token", {
+              success: false,
+              message: 'You must be logged in to comment.'
+            }));
+
+          } else {
+
+            Comment.create(req.body).then(function(comment){
+
+              comment.setUser(author).then(function(authoredComment){
+
+                gradient.addComment(authoredComment).then(function(savedComment){
+                  res.status(200).json({
+                    success: true,
+                    message: 'Comment created.',
+                    commentCreated: savedComment
+                  }); 
+                }).then(function(err){
+                  console.log(err);
+                  return next(err);
+                });
+
+              }).catch(function(err){
+                console.log(err);
+                return next(err);
+              });
+
+            }).catch(function(err){
+              console.log(err);
+              return next(err);
+            });
+
+          }
+
+        }).catch(function(err){
+          console.log(err);
+          return next(err);
+        });
+
       }
 
     }).catch(function(err) {
@@ -103,18 +166,18 @@ module.exports = function (Models) {
       gradientUtils.autoprefixCss(gradientObject.body, function(err, autoprefixedCss){
         gradientObject.body_autoprefixed = autoprefixedCss;
 
-        Gradient.create(gradientObject).then(function(gradient){
+        User.findOne({ where: { id: req.user.id } }).then(function(author){
 
-          User.findOne({ where: { id: req.user.id } }).then(function(author){
+          if (!author){
 
-            if (!author){
+            return next(new UnauthorizedAccessError("invalid_token", {
+              success: false,
+              message: 'You must be logged in to save a new gradient.'
+            }));
 
-              return next(new UnauthorizedAccessError("invalid_token", {
-                success: false,
-                message: 'You must be logged in to save a new gradient.'
-              }));
+          } else {
 
-            } else {
+            Gradient.create(gradientObject).then(function(gradient){
 
               gradient.setUser(author).then(function(authoredGradient){
                 res.status(200).json({
@@ -127,12 +190,12 @@ module.exports = function (Models) {
                 return next(err);
               });
 
-            }
+            }).catch(function(err){
+              console.log(err);
+              return next(err);
+            });
 
-          }).catch(function(err){
-            console.log(err);
-            return next(err);
-          });
+          }
 
         }).catch(function(err){
           console.log(err);

@@ -24,20 +24,13 @@ angular.module('draggableModule', []).
  
         function mousemove($event) {
           var dx = $event.clientX - initialMouseX;
-          //var dy = $event.clientY - initialMouseY;
           elm.css({
-            //top:  startY + dy + 'px',
             left: startX + dx + 'px'
           });
           scope.$apply(function(){
-          	// scope.gradients[attrs.gradientId] = {
-          	// 	//top: $event.clientY / window.innerHeight * 100,
-          	// 	//left: $event.clientX / window.innerWidth * 100
-          	// 	left: (elm.prop('offsetLeft') + (elm.prop('clientWidth')/2)) / window.innerWidth * 100,
-           //    color: scope.gradients[attrs.gradientId].color
-          	// }
             var leftAmount = (elm.prop('offsetLeft') + (elm[0].clientWidth/2)) / window.innerWidth * 100;
-            colorStopRegister.setGradientLeft(attrs.gradientId, leftAmount.toPrecision(7)); 
+            colorStopRegister.setGradientLeft(attrs.gradientId, leftAmount.toPrecision(7));
+            scope.gradientCssString = scope.getGradientCssString();
           });         
           return false;
         }

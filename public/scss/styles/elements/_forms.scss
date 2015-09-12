@@ -144,8 +144,13 @@ textarea {
 textarea {
   clear:both;
   display:block;
-  padding:1em;
+  padding:0.5em;
+  min-height:6em;
   width:100%;
+  font-size:0.5em;
+  border: 2px solid $purple;
+  background-color:$lightgrey;
+  box-shadow:inset 0 0 7px rgba(0,0,0,0.5);
 }
 
 .select {

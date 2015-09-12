@@ -1,0 +1,92 @@
+.gradient-social {
+	position:absolute;
+	top:0;
+	left:0;
+	width:320px;
+	height:100%;
+	transform:translateX(-320px);
+	transition:transform 0.3s ease-in-out;
+	background-color:$softgrey;
+	z-index:2000;
+}
+
+.gradient-social.gradient-social--open {
+	transform:translateX(0);
+}
+
+.gradient-editor.gradient-social--open {
+	transform:translateX(320px);
+}
+
+.gradient-social__author-card {
+	background-color:rgba(0,0,0,0.2);
+	padding:1em;
+}
+
+.gradient-social__author-card__avatar {
+	width:2.5em;
+	height:2.5em;
+	float:left;
+}
+
+.gradient-social__author-card__byline {
+	float:left;
+	padding-left:0.5em;
+}
+
+.gradient-title {
+	margin-bottom:0.225em;
+}
+
+h6.gradient-byline {
+	font-size:0.8em;
+	font-weight:300;
+	color:$lightgrey;
+	margin-bottom:0;
+	a {
+		color:$blue;
+	}
+}
+
+.gradient-social__comments {
+	padding:1em;
+}
+
+.gradient-comment-form {
+	position:absolute;
+	bottom:2em;
+	width:100%;
+	background-color:$darkgrey;
+}
+
+.gradient-comment-form textarea {
+	margin:0 0 u(0.5rem) 0;
+}
+
+.gradient-comment__input {
+	@extend .clearfix;
+	height:1.5em;
+}
+
+.gradient-comment__input input[type="submit"] {
+	font-size:0.6em;
+	float:right;
+	height:2.5em;
+	line-height:1.8em;
+	padding-left:0.5em;
+	padding-right:0.5em;
+	margin:0;
+}
+
+.gradient-comment__current-user em {
+	font-size:0.5em;
+	float:left;
+	line-height:2.5em;
+}
+
+.gradient-comment__author-card__avatar {
+	height:0.8em;
+	width:0.8em;
+	float:left;
+	margin:0.25em 0.25em 0.2em 0;
+}
