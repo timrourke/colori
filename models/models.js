@@ -1,6 +1,8 @@
 // User model
 var bcrypt 				= require('bcryptjs'),
-		uuid 					= require('uuid');
+		uuid 					= require('uuid'),
+		path					= require('path'),
+		gradientUtils	= require(path.join(__dirname, '..', 'utils', 'gradientUtils'));
 
 module.exports = function(sequelize, Sequelize) {
 
@@ -31,12 +33,6 @@ module.exports = function(sequelize, Sequelize) {
 			}},
 		dribble_handle: 					{ type: Sequelize.STRING, defaultValue: null },
 		codepen_handle: 					{ type: Sequelize.STRING, defaultValue: null }
-	},{
-		hooks: {
-			beforeUpdate: function(userProfile, options) {
-				userProfile.modified = Sequelize.NOW;
-			}
-		}
 	});
 
 	var User = sequelize.define('User', {
@@ -67,16 +63,12 @@ module.exports = function(sequelize, Sequelize) {
 					cb(null, isMatch);
 				});
 			}
-		},
-		hooks: {
-			beforeUpdate: function(user, options) {
-				user.modified = Sequelize.NOW;
-			}
 		}
 	});
 
 	var Gradient = sequelize.define('Gradient', {
-		title: 										{ type: Sequelize.STRING, unique: true, allowNull: false, 
+		permalink: 								{ type: Sequelize.STRING, unique: true, allowNull: false }, 
+		title: 										{ type: Sequelize.STRING, 
 			validate: {
 				len: {
 					args: [4, 200],
@@ -107,6 +99,22 @@ module.exports = function(sequelize, Sequelize) {
 					msg: 'Sorry, your gradient\'s description must be under 6000 characters long.'
 				}
 			} 
+		},
+		color_stops: 							{ type: Sequelize.JSON, allowNull: false },
+		hearts: 									{ type: Sequelize.INTEGER, defaultValue: 0 },
+		views: 										{ type: Sequelize.INTEGER, defaultValue: 0 }
+	},{
+		hooks: {
+			beforeUpdate: function(gradient, options) {
+				gradientUtils.autoprefixCss(gradient.body, function(err, autoprefixedCss){
+					gradient.body_autoprefixed = autoprefixedCss;
+				});
+			},
+			beforeValidate: function(gradient, options) {
+				gradientUtils.autoprefixCss(gradient.body, function(err, autoprefixedCss){
+					gradient.body_autoprefixed = autoprefixedCss;
+				});
+			}
 		}
 	});
 

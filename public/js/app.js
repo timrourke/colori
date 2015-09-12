@@ -48,6 +48,11 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 	  		templateUrl: '/partials/editor.html',
 				controller: 'gradientController'
 	  	}).
+	  	state('gradient', {
+	  		url: '/gradients/:permalink',
+	  		templateUrl: '/partials/editor.html',
+	  		controller: 'gradientController'
+	  	}).
 	    state('login', {
 	      url: '/login',
 	      templateUrl: '/partials/login.html',
@@ -156,9 +161,34 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 	    }
 	  }
 	}])
-	.service('gradientRegister', function() {
+	.factory('gradientService', ['$http', 'urls', function($http, urls){
+		return {
+			getGradients: function(success, error){
+				$http.get(urls.BASE + '/gradients').then(function(res){
+					success(res.data);
+				}, function(err){
+					error(err.data);
+				});
+			},
+			getGradient: function(permalink, success, error){
+				$http.get(urls.BASE + '/gradients/' + permalink).then(function(res){
+					success(res.data);
+				}, function(err) {
+					error(err.data);
+				});
+			},
+			createGradient: function(gradient, success, error){
+				$http.post(urls.BASE + '/gradients', gradient).then(function(res){
+					success(res.data);
+				}, function(err){
+					error(err.data);
+				});
+			}
+		}
+	}])
+	.service('colorStopRegister', function() {
 		var pickerCount = 0;
-		var gradients = [];
+		var colorStops = [];
 		return {
 			increasePickerCount: function() {
 				pickerCount++;
@@ -166,31 +196,51 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 			getPickerCount: function() {
 				return pickerCount;
 			},
-			pushGradient: function(el) {
+			pushColorStop: function(el) {
 				var newGradient = {
 					id: pickerCount,
 					left: ((el.prop('offsetLeft') + (el.prop('clientWidth')/2)) / window.innerWidth * 100).toPrecision(5),
-	        color: ( Object.size(gradients) > 1 ) ? gradients.gradient0.color : 'white'
+	        color: ( Object.size(colorStops) > 1 ) ? colorStops.gradient0.color : 'white'
 				};
-				gradients['gradient' + pickerCount] = newGradient;
+				colorStops['gradient' + pickerCount] = newGradient;
 				//console.log(newGradient);
 				pickerCount++;
 			},
 			setGradientLeft: function(gradientId, leftAmount) {
-				gradients['gradient' + gradientId].left = leftAmount;
+				colorStops['gradient' + gradientId].left = leftAmount;
 			},
-			getGradients: function() {
-				return gradients;
+			setColorStops: function(newColorStops) {
+				colorStops = newColorStops;
+			},
+			getColorStops: function() {
+				return colorStops;
 			}
 		};
 		
 	})
-	.controller('gradientController', ['$scope', 'gradientRegister', function($scope, gradientRegister) {
-		
-		$scope.gradients = gradientRegister.getGradients();
+	.controller('gradientController', ['$scope', '$compile', 'colorStopRegister', 'gradientService', '$stateParams', function($scope, $compile, colorStopRegister, gradientService, $stateParams) {
 
-		$scope.pushGradient = function() {
-			gradientRegister.pushGradient();
+		$scope.init = function() {
+			// If browsing to a predefined gradient, display it on screen
+			if (typeof $stateParams.permalink != 'undefined') {
+				gradientService.getGradient($stateParams.permalink,
+					function(res){
+						console.log(res);
+						colorStopRegister.setColorStops(res.gradientFound.color_stops);
+						$scope.colorStops = res.gradientFound.color_stops;
+						$scope.injectColorPicker(res.gradientFound.color_stops[0]);
+					}, function(err){
+						console.log(err);
+					});
+			
+			} else {
+			// If not displaying a predefined a gradient, display a blank canvas
+				$scope.colorStops = colorStopRegister.getColorStops();	
+			}
+		}
+
+		$scope.pushColorStop = function() {
+			colorStopRegister.pushColorStop();
 		};
 
 		$scope.showCss = false;
@@ -199,46 +249,46 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 			$scope.showCss = !$scope.showCss;
 		};
 
-		$scope.increasePickerCount = gradientRegister.increasePickerCount;
+		$scope.increasePickerCount = colorStopRegister.increasePickerCount;
 
-		var sortGradientsByPositionLeft = function(gradients) {
-			var sortedGradients = [];
+		var sortColorStopsByPositionLeft = function(colorStops) {
+			var sortedColorStops = [];
 
 			//Sort gradient stops by how far left they are. Allows
 			//gradient stops to be ordered and still produce a
 			//consistent result.
-			bySortedLeftValue(gradients, function(key, value) {
-				sortedGradients.push(value);
+			bySortedLeftValue(colorStops, function(key, value) {
+				sortedColorStops.push(value);
 			});
 
-			return sortedGradients;
+			return sortedColorStops;
 		}
 
 		var getGradientCssString = function() {
-			var gradients = sortGradientsByPositionLeft(gradientRegister.getGradients());
+			var colorStops = sortColorStopsByPositionLeft(colorStopRegister.getColorStops());
 
 			var result = 'background:';
 
 			//If we have liear gradient stops in our service, 
 			//build a css string for our inline style block.
-			if (gradients.length > 1) {
+			if (colorStops.length > 1) {
 				var counter = 0;
 				result += 'linear-gradient(\n\t   to right,';
-				for(var i = 0; i < gradients.length; i++) {
-					result += '\n\t   ' + gradients[i].color + ' ' + parseFloat(gradients[i].left).toPrecision(5) + '%';
-					if (i + 1 !== gradients.length) {
+				for(var i = 0; i < colorStops.length; i++) {
+					result += '\n\t   ' + colorStops[i].color + ' ' + parseFloat(colorStops[i].left).toPrecision(5) + '%';
+					if (i + 1 !== colorStops.length) {
 						result += ",";
 					}
 				}
 				result += ");";
 			//If there's only one gradient color stop on screen,
 			//give it a default color of white to start with.
-			}	else if (gradients.length == 1) {
-				result += (gradients[0]) ? gradients[0].color : 'white';
+			}	else if (colorStops.length == 1) {
+				result += (colorStops[0]) ? colorStops[0].color : 'white';
 				result += ';';
 			//On initialization of the view, use a pretty default
 			//linear gradient seen here.
-			}	else if (gradients.length < 1) {
+			}	else if (colorStops.length < 1) {
 				result += 'linear-gradient(\n\t   to right, \n\t   rgba(0,133,255,1) 0%, \n\t   rgba(0,209,255,1) 50%, \n\t   rgba(0,255,178,1) 100%);';
 			}
 			
@@ -253,57 +303,39 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 				return getGradientCssString();
 			},
 			function(newValue, oldValue){
-				$scope.gradientCssString = getGradientCssString();			
+				$scope.gradientCssString = getGradientCssString();
 			});
 
 		$scope.saveGradient = function(){
-			var test = sortGradientsByPositionLeft(gradientRegister.getGradients());
-			console.log(test);
+			var newGradient = {
+				title: 'New Gradient',
+				body: getGradientCssString(),
+				description: 'This is a test gradient.',
+				color_stops: sortColorStopsByPositionLeft(colorStopRegister.getColorStops())
+			}
+			gradientService.createGradient(newGradient,
+				function(res){
+					console.log(res);
+				}, function(err){
+					console.log(err);
+				});
 		}
 
-	}])
-	.controller('gradientGridController', ['$scope', function($scope) {
+		$scope.init();
 
-		$scope.gradientItems = [{
-			author: 'sprinkles',
-			views: 14,
-			hearts: 237,
-			comments:16,
-			gradient: 'background-image:linear-gradient(to right, rgba(0,133,255,1) 0%, rgba(0,209,255,1) 50%, rgba(0,255,178,1) 100%);'
-		},{
-			author: 'Kefo23',
-			views: 289,
-			hearts: 12,
-			comments:36,
-			gradient: 'background-image:linear-gradient(to right, rgba(171,64,209,1) 3.2986%, rgba(144,91,214,1) 50.000%, rgba(64,87,209,1) 94.826%);'
-		},{
-			author: 'arrMarquez',
-			views: 53,
-			hearts: 48,
-			comments:3,
-			gradient: 'background-image:linear-gradient(to right, rgba(119,209,64,1) 3.2986%, rgba(197,214,91,1) 50.000%, rgba(209,134,64,1) 94.826%);'
-		},{
-			author: 'Ribbin',
-			views: 6,
-			hearts: 12,
-			comments:36,
-			gradient: 'background-image:linear-gradient(to right, rgba(64,209,70,1) 3.2986%, rgba(91,214,177,1) 32.535%, rgba(64,200,209,1) 62.188%, rgba(64,122,209,1) 100.45%);'
-		},{
-			author: 'JMT Group',
-			views: 47,
-			hearts: 2,
-			comments:0,
-			gradient: 'background-image:linear-gradient(to right, rgba(50,66,145,1) 1.1458%, rgba(50,145,99,1) 50.000%, rgba(52,145,50,1) 99.549%);'
-		},{
-			author: 'looloo',
-			views: 158,
-			hearts: 27,
-			comments:1,
-			gradient: 'background-image:linear-gradient(to right,rgba(245,255,218,1) 1.9792%,rgba(218,248,255,1) 50.000%,rgba(255,220,218,1) 98.993%);'
-		}]
+	}])
+	.controller('gradientGridController', ['$scope', '$rootScope', 'gradientService', function($scope, $rootScope, gradientService) {
+
+		$scope.gradientItems = [];
 
 		$scope.init = function() {
-			
+			gradientService.getGradients(function(res){
+				console.log(res);
+				$scope.gradientItems = res.gradientsFound;
+			}, function(err){
+				console.log(err);
+				$rootScope.message = err.message;
+			});
 		}
 
 		$scope.sortOrder = '-hearts';
@@ -311,21 +343,23 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 		$scope.init();
 
 	}])
-	.directive('addGradientPicker', ['$compile', 'gradientRegister', function($compile, gradientRegister){
+	.directive('addGradientPicker', ['$compile', 'colorStopRegister', function($compile, colorStopRegister){
 		return {
 			restrict: 'E',
 			template: '<button type="button" ng-click="addGradientPicker()"><svg class="icon" viewBox="0 0 600 600"><use xlink:href="#eyedropper_45_add" /></svg></button>',
 			controller: function($scope, $element, $attrs) {
+
 				$scope.addGradientPicker = function() {
-					var gradCount = gradientRegister.getPickerCount();
-					var el = $compile('<div class="colorpicker__wrapper" draggable gradient-id="' + gradCount + '"><button class="colorpicker__button" style="border:3px solid {{gradients.gradient' + gradCount + '.color}};" colorpicker="rgba" colorpicker-position="custom" colorpicker-with-input="true" ng-model="gradients.gradient' + gradCount + '.color">' + (gradCount + 1) + '<div class="colorpicker__button-position-arrow" style="border-top:10px solid {{gradients.gradient' + gradCount + '.color}};"></div></button></div>')($scope);
+					var gradCount = colorStopRegister.getPickerCount();
+					var el = $compile('<div class="colorpicker__wrapper" draggable gradient-id="' + gradCount + '"><button class="colorpicker__button" style="border:3px solid {{colorStops.gradient' + gradCount + '.color}};" colorpicker="rgba" colorpicker-position="custom" colorpicker-with-input="true" ng-model="colorStops.gradient' + gradCount + '.color">' + (gradCount + 1) + '<div class="colorpicker__button-position-arrow" style="border-top:10px solid {{colorStops.gradient' + gradCount + '.color}};"></div></button></div>')($scope);
 					var elDest = document.querySelector('.gradient-wrapper');
 					angular.element(elDest).append(el);
 					el.css({
 						left: ((window.innerWidth/2) - (el[0].clientWidth/2)).toPrecision(7) + 'px'
 					});					
-					gradientRegister.pushGradient(el);
+					colorStopRegister.pushColorStop(el);
 				};
+
 			}
 		};
 	}])
@@ -337,7 +371,8 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
 			views: '=',
 			hearts: '=',
 			comments: '=',
-			gradient: '='
+			gradient: '=',
+			permalink: '='
 		},
 		templateUrl: '/partials/directives/gradient-item.html',
 		link: function(scope, element, attributes) {
@@ -403,8 +438,8 @@ angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpick
   $scope.init = function() {
     Users.getUsers(function(res) {
       $scope.users = res.foundUsers;
-    }, function(res) {
-      $rootScope.message = res.message;
+    }, function(err) {
+      $rootScope.message = err.message;
     });
   }
 

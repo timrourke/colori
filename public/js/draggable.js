@@ -4,7 +4,7 @@
  */
 
 angular.module('draggableModule', []).
-  directive('draggable', ['$document', 'gradientRegister', function($document, gradientRegister) {
+  directive('draggable', ['$document', 'colorStopRegister', function($document, colorStopRegister) {
     return {
       restrict: 'A',
       controller: 'gradientController',
@@ -37,7 +37,7 @@ angular.module('draggableModule', []).
            //    color: scope.gradients[attrs.gradientId].color
           	// }
             var leftAmount = (elm.prop('offsetLeft') + (elm[0].clientWidth/2)) / window.innerWidth * 100;
-            gradientRegister.setGradientLeft(attrs.gradientId, leftAmount.toPrecision(7)); 
+            colorStopRegister.setGradientLeft(attrs.gradientId, leftAmount.toPrecision(7)); 
           });         
           return false;
         }

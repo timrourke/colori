@@ -6,7 +6,10 @@ var debug = require('debug')('app:routes:gradients' + process.pid),
     path = require('path'),
     async = require('async'),
     Router = require("express").Router,
-    tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils'));
+    tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils')),
+    gradientUtils = require(path.join(__dirname, '..', '..', 'utils', 'gradientUtils')),
+    srs = require('secure-random-string'),
+    UnauthorizedAccessError = require(path.join(__dirname, '..', '..', 'errors', 'UnauthorizedAccessError'));
 
 module.exports = function (Models) {
 
@@ -36,40 +39,108 @@ module.exports = function (Models) {
     });
   });
 
+  router.route('/:permalink').get(function(req, res, next) {
+    Gradient.findOne({ where: { permalink: req.params.permalink }, include: [{ model: User }, { model: Comment }] }).then(function(gradient) {
+
+      if (!gradient) {
+        res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
+      } else {
+        res.status(200).json({
+          success: true,
+          message: '1 gradient found.',
+          gradientFound: gradient
+        }); 
+      }
+
+    }).catch(function(err) {
+      console.log(err);
+      return next(err);
+    });
+  });
+
+  function generateSrs(length, callback) {
+    srs({ length: length }, function(err, sr){
+      if (err) {
+        callback(err);
+      } else {
+        callback(null, sr);
+      }
+    });
+  }
+
+  function assignGradientPermalink(callback) {
+    generateSrs(8, function(err, srs){
+      if (err) return next(err);
+
+      //Make sure permalink value does not contain underscores and hyphens.
+      if (srs.indexOf('-') != -1 || srs.indexOf('_') != -1) {
+        return assignGradientPermalink(callback);
+      }
+
+      Gradient.findOne({ where: { permalink: srs } }).then(function(existingGradientWithPermalink){
+        if (existingGradientWithPermalink) {
+          assignGradientPermalink(callback);
+        } else {
+          callback(null, srs);
+        }
+      }).catch(function(err){
+        console.log(err);
+        callback(err);
+      });
+
+    });  
+  }
+
   router.route('/').post(tokenUtils.middleware(), function(req, res, next) {
 
-    Gradient.create(req.body).then(function(gradient){
+    var gradientObject = req.body;
 
-      User.findById(req.user.id).then(function(author){
+    assignGradientPermalink(function(err, srs){
+      if (err) return next(err);
 
-        if (!author || author.length == 0){
+      gradientObject.permalink = srs; 
 
-          return next(new UnauthorizedAccessError("invalid_token", {
-            success: false,
-            message: 'You must be logged in to add create a gradient.'
-          }));
+      gradientUtils.autoprefixCss(gradientObject.body, function(err, autoprefixedCss){
+        gradientObject.body_autoprefixed = autoprefixedCss;
 
-        } else {
+        Gradient.create(gradientObject).then(function(gradient){
 
-          gradient.setUser(author).then(function(authoredGradient){
-            res.status(200).json({
-              success: true,
-              message: (authoredGradient.length > 1) ? authoredGradient.length + ' gradients created.' : '1 gradient created.',
-              commentCreated: authoredGradient
-            }); 
+          User.findOne({ where: { id: req.user.id } }).then(function(author){
+
+            if (!author){
+
+              return next(new UnauthorizedAccessError("invalid_token", {
+                success: false,
+                message: 'You must be logged in to save a new gradient.'
+              }));
+
+            } else {
+
+              gradient.setUser(author).then(function(authoredGradient){
+                res.status(200).json({
+                  success: true,
+                  message: 'Gradient created.',
+                  gradientCreated: authoredGradient
+                }); 
+              }).catch(function(err){
+                console.log(err);
+                return next(err);
+              });
+
+            }
+
           }).catch(function(err){
+            console.log(err);
             return next(err);
           });
 
-        }
+        }).catch(function(err){
+          console.log(err);
+          return next(err);
+        });
 
-      }).catch(function(err){
-        return next(err);
       });
 
-    }).catch(function(err){
-      console.log(err);
-      return next(err);
     });
 
   });
