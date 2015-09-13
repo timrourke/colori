@@ -8,6 +8,7 @@ html, body {
 }
 
 main {
+  @extend .clearfix;
   position:absolute;
   top:0;
   left:0;
@@ -25,15 +26,16 @@ main {
 }
 
 .wrapper {
-  position:absolute;
-  display:block;
-  width:100%;
-  height:100%;
-  top:0;
-  left:0;
+  // position:absolute;
+  // display:block;
+  // width:100%;
+  // height:100%;
+  // top:0;
+  // left:0;
 }
 
 section {
+  @extend .clearfix;
   padding:0.5em 0.5em 2em 0.5em;
   height:100%;
 }

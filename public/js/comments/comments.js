@@ -5,7 +5,8 @@ angular.module('coloriAppComments', ['coloriAppAnimator'])
 		templateUrl: '/partials/directives/comment-directive.html',
 		scope: {
 			body: '=',
-			author: '='
+			author: '=',
+			posted: '='
 		},
 		link: {
 			pre: function(scope, element, attributes) {

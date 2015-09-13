@@ -55,6 +55,10 @@ h6.gradient-byline {
 	height:100%;
 }
 
+.gradient-comments__header {
+	margin-bottom:0.8em;
+}
+
 .gradient-comment-form {
 	position:absolute;
 	bottom:2em;
@@ -101,6 +105,45 @@ h6.gradient-byline {
 	margin:0.25em 0.25em 0.2em 0;
 }
 
+.gradient-comment__header {
+	@extend .clearfix;
+}
+
+.gradient-comment__author-avatar {
+	width:3em;
+	height:3em;
+	float:left;
+}
+
+.gradient-comment__meta,
+.gradient-comment__author,
+.gradient-comment__date {
+	float:left;
+	margin-left:0.325em;
+}
+
+.gradient-comment__meta {
+	@extend .clearfix;
+	padding-top:0.25em;
+}
+
+.gradient-comment__author {
+	font-weight:400;
+}
+
+.gradient-comment__date {
+	clear:left;
+	color:$lightgrey;
+}
+
+.gradient-comment__body {
+	margin-top:0.8em;
+	margin-bottom:0;
+}
+
 comment-directive {
 	display:block;
+	font-size:0.8em;
+	padding:1em 0;
+	border-top:1px solid rgba(0,0,0,0.2);
 }

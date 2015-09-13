@@ -83,8 +83,21 @@ angular.module('coloriAppAuthorization', ['ngStorage', 'ui.router', 'angular-jwt
 	    }
 	  }
 	}])
-	.controller('LoginController', ['$rootScope', '$scope', '$location', '$localStorage', 'Auth', 
-  function LoginController($rootScope, $scope, $location, $localStorage, Auth) {
+  .factory('LoginFailed', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+
+      var alert = $mdDialog.alert()
+        .title('Couldn\'t log in!')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+
+    }
+
+  }])
+	.controller('LoginController', ['$rootScope', '$scope', '$location', '$localStorage', 'Auth', 'LoginFailed', 
+  function LoginController($rootScope, $scope, $location, $localStorage, Auth, LoginFailed) {
 
     $scope.$watch(function(scope){
       return Auth.getUser()
@@ -110,6 +123,9 @@ angular.module('coloriAppAuthorization', ['ngStorage', 'ui.router', 'angular-jwt
           password: ''
         }
       }, function (res) {
+        LoginFailed(res.message).then(function(){
+          console.log('success');
+        });
         $rootScope.message = res.message;
       });
     };

@@ -1,6 +1,14 @@
 <article class="gradient-comment">
 	<header class="gradient-comment__header">
-		<em>{{author}}</em>	
+		<div class="gradient-comment__author-avatar">
+      <svg ng-if="user.UserProfile.avatar_url == null" class="icon site-user__avatar" viewBox="0 0 600 600">
+        <use xlink:href="#anonymous_user" />
+      </svg>
+    </div>
+    <div class="gradient-comment__meta">
+    	<span class="gradient-comment__author"><a ui-sref="users.detail({ username: author })">{{author}}</a></span>
+			<span class="gradient-comment__date">{{posted | amTimeAgo}}</span>
+    </div>
 	</header>
-  <p>{{body}}</p>
+  <p class="gradient-comment__body">{{body}}</p>
 </article>

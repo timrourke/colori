@@ -296,6 +296,7 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 	return {
 		restrict: 'E',
 		scope: {
+			title: '=',
 			author: '=',
 			views: '=',
 			hearts: '=',

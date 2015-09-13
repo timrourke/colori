@@ -20,7 +20,7 @@
       </header>
       <ul class="gradient-comments__list">
         <li class="gradient-comments__list-item" ng-repeat="comment in gradient.Comments">
-          <comment-directive body="comment.body" author="comment.User.username"></comment-directive>
+          <comment-directive body="comment.body" author="comment.User.username" posted="comment.createdAt"></comment-directive>
         </li>
       </ul>
     </div>

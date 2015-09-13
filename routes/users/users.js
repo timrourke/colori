@@ -4,6 +4,7 @@ var debug = require('debug')('app:routes:users' + process.pid),
     _ = require("lodash"),
     util = require('util'),
     path = require('path'),
+    tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils')),
     async = require('async'),
     Router = require("express").Router;
 
@@ -54,7 +55,7 @@ module.exports = function (Models) {
 
   var isUserInReqBodySelfOrAdmin = function(user, req, res, next){
     if (req.user.id != user.id && req.user.is_admin != true) {
-      return next(new UnauthorizedAccessError('not_authorized', 'You do not have access privileges to edit this resource.'));
+      return next(new UnauthorizedAccessError('not_authorized', 'Sorry, you do not have access privileges to edit this resource.'));
     } else if (req.user.id == user.id || req.user.is_admin == true) {
       next();
     }
@@ -70,7 +71,7 @@ module.exports = function (Models) {
         isUserInReqBodySelfOrAdmin(user, req, res, function(){
 
           if (updatedUserProperties.password && updatedUserProperties.password != updatedUserProperties.confirmpassword) {
-            res.status(449).json({ success: false, message: "Password not changed. New password must match the confirmation password." })
+            res.status(449).json({ success: false, message: "Sorry, your password was not changed. The new password must match the confirmation password." })
           }
 
           user.update(updatedUserProperties, { fields: [ 'username', 'email', 'password' ] }).then(function(updatedUser) {
@@ -97,16 +98,14 @@ module.exports = function (Models) {
       if (err) {
         return next(err);
       } else if (!user || user == null) {
-        res.status(404).json({ success: false, message: 'No users found.' }); 
+        res.status(404).json({ success: false, message: 'Sorry, no users found with the username ' + req.params.username + '.' }); 
       } else {
         
         //foundUser includes user, should also include their user profile.
         res.json({
           success: true,
           message: 'User found by username ' + req.params.username + '.',
-          foundUser: user.get({
-            plain: true
-          })
+          foundUser: user
         }); 
         
       }
@@ -114,12 +113,12 @@ module.exports = function (Models) {
     });
   });
 
-  router.route('/:username').put(function(req, res, next) {
+  router.route('/:username').put(tokenUtils.middleware(), function(req, res, next) {
     findUserByUsernameAndUpdate(req.params.username, req.body, req, res, function(err, updatedUser) {
       if (err) {
         return next(err);
       } else if (!updatedUser || updatedUser == null) {
-        res.status(404).json({ success: false, message: 'No users found.' }); 
+        res.status(404).json({ success: false, message: 'Sorry, no users found with the username ' + req.params.username + '.' }); 
       } else {
 
         var returnedUpdatedUser = updatedUser.get({
@@ -128,7 +127,7 @@ module.exports = function (Models) {
 
         res.json({
           success: true,
-          message: 'User ' + updatedUser.username + ' successfully updated.',
+          message: 'Thanks! User ' + updatedUser.username + ' was successfully updated.',
           updatedUser: _.omit(returnedUpdatedUser, ['password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid'])
         }); 
         

@@ -64,7 +64,7 @@ app.use('/partials', express.static(__dirname + '/public/partials'));
  * API Routes
  *
  */
-app.use('/api', tokenUtils.middleware().unless({path: ['/api/auth/login', '/api/auth/signup', '/api/auth/logout', '/api/gradients', '/api/comments', '/api/userprofiles']}));
+//app.use('/api', tokenUtils.middleware().unless({path: ['/api/auth/login', '/api/auth/signup', '/api/auth/logout', '/api/gradients', '/api/comments', '/api/userprofiles']}));
 app.use("/api/auth", require(path.join(__dirname, 'routes', 'users', 'authorization.js'))(Models));
 app.use("/api/users", require(path.join(__dirname, 'routes', 'users', 'users.js'))(Models));
 app.use("/api/gradients", require(path.join(__dirname, 'routes', 'gradients', 'gradients.js'))(Models));

@@ -83,7 +83,7 @@ module.exports = function (Models) {
     });
   });
 
-  router.route('/:permalink/comment').post(function(req, res, next) {
+  router.route('/:permalink/comment').post(tokenUtils.middleware(), function(req, res, next) {
     Gradient.findOne({ where: { permalink: req.params.permalink }, 
       include: [{ 
         model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt']  
