@@ -127,11 +127,6 @@ md-dialog {
     padding-left: 16px;
     min-height: 52px;
     overflow: hidden; }
-    md-dialog .md-actions .md-button {
-      margin-bottom: 8px;
-      margin-left: 8px;
-      margin-right: 0;
-      margin-top: 8px; }
   md-dialog.md-content-overflow .md-actions {
     border-top-width: 1px;
     border-top-style: solid; }
@@ -139,3 +134,7 @@ md-dialog {
 @media screen and (-ms-high-contrast: active) {
   md-dialog {
     border: 1px solid #fff; } }
+
+md-dialog .md-title {
+  @extend .typl8-beta;
+}

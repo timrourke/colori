@@ -122,11 +122,10 @@ angular.module('coloriAppAuthorization', ['ngStorage', 'ui.router', 'angular-jwt
           username: '',
           password: ''
         }
-      }, function (res) {
-        LoginFailed(res.message).then(function(){
+      }, function (err) {
+        LoginFailed(err.message).then(function(){
           console.log('success');
         });
-        $rootScope.message = res.message;
       });
     };
 

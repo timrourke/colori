@@ -73,7 +73,33 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 		};
 		
 	}])
-	.controller('gradientController', ['$scope', '$compile', 'colorStopRegister', 'gradientService', '$stateParams', function($scope, $compile, colorStopRegister, gradientService, $stateParams) {
+	.factory('GradientSaveFailed', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+
+      var alert = $mdDialog.alert()
+        .title('Couldn\'t save this gradient!')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+
+    }
+
+  }])
+	.factory('CommentSaveFailed', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+
+      var alert = $mdDialog.alert()
+        .title('Couldn\'t save this comment!')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+
+    }
+
+  }])
+	.controller('gradientController', ['$scope', '$compile', 'colorStopRegister', 'gradientService', '$stateParams', 'GradientSaveFailed', function($scope, $compile, colorStopRegister, gradientService, $stateParams, GradientSaveFailed) {
 
 		$scope.gradient = {};
 
@@ -135,7 +161,9 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 					 };
 					$scope.gradient.Comments.push(res.commentCreated);
 				}, function(err){
-					console.log(err);
+					CommentSaveFailed(err.message).then(function(){
+						console.log(err);
+					});
 				});
 		}
 
@@ -165,7 +193,8 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 
 		var getGradientCssString = function() {
 			var colorStops = sortColorStopsByPositionLeft(colorStopRegister.getColorStops());
-			
+			$scope.sortedColorStops = colorStops;
+
 			var result = 'background:';
 
 			//If we have liear gradient stops in our service, 
@@ -218,7 +247,9 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 				function(res){
 					console.log(res);
 				}, function(err){
-					console.log(err);
+					GradientSaveFailed(err.message).then(function(){
+						console.log(err);
+					});
 				});
 		}
 
@@ -289,7 +320,7 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 	.directive('addGradientPicker', [function(){
 		return {
 			restrict: 'E',
-			template: '<button type="button" ng-click="addColorPicker()"><svg class="icon" viewBox="0 0 600 600"><use xlink:href="#eyedropper_45_add" /></svg></button>'
+			template: '<button type="button" ng-click="addColorPicker()"><svg style="fill:{{sortedColorStops[0].color || \'white\'}};" class="icon" viewBox="0 0 600 600"><use xlink:href="#eyedropper_45_add" /></svg></button>'
 		};
 	}])
 .directive('gradientItem', [function() {

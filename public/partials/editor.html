@@ -8,11 +8,10 @@
         </svg>
       </div>
       <div class="gradient-social__author-card__byline">
-        <h5 class="gradient-title">{{gradient.title}}</h5>
-        <h6 class="gradient-byline">by <a ui-sref="users.detail({ username: user.username })">{{gradient.User.username}}</a></h6>  
+        <h5 class="gradient-title">{{gradient.title || 'Untitled Gradient'}}</h5>
+        <h6 ng-if="gradient.User" class="gradient-byline">by <a ui-sref="users.detail({ username: user.username })">{{gradient.User.username}}</a></h6>
+        <h6 ng-if="!gradient.User" class="gradient-byline">by Anonymous</h6>
       </div>
-      
-      
     </header>
     <div class="gradient-social__comments">
       <header class="gradient-comments__header">
@@ -42,18 +41,18 @@
   <section class="gradient-editor" ng-class="{'gradient-social--open': showSocial, 'gradient-social--close': !showSocial}">
     <nav class="tools">
       <button class="gradient-editor__save-gradient" type="button" ng-click="saveGradient()">
-        <svg class="icon" viewBox="0 0 600 600">
+        <svg style="fill:{{sortedColorStops[0].color || 'white'}};" class="icon" viewBox="0 0 600 600">
           <use xlink:href="#save" />
         </svg>
       </button>
       <add-gradient-picker></add-gradient-picker>
       <button class="gradient-string-toggle" ng-click="toggleCss()" ng-class="{'gradient-string--open': showCss, 'gradient-string--close': !showCss}">
-        <svg class="icon" viewBox="0 0 600 600">
+        <svg style="fill:{{sortedColorStops[0].color || 'white'}};" class="icon" viewBox="0 0 600 600">
           <use xlink:href="#code" />
         </svg>
       </button>
       <button class="gradient-social-toggle" ng-click="toggleSocialPanel()" ng-class="{'gradient-social--open': showSocial, 'gradient-social--close': !showSocial}">
-        <svg ng-if="user.UserProfile.avatar_url == null" class="icon site-user__avatar" viewBox="0 0 600 600">
+        <svg style="fill:{{sortedColorStops[0].color || 'white'}};" ng-if="user.UserProfile.avatar_url == null" class="icon" viewBox="0 0 600 600">
           <use xlink:href="#anonymous_user" />
         </svg>
       </button>

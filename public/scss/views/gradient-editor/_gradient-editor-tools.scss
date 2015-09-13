@@ -22,3 +22,7 @@
 		padding:0.25em;
   }
 }
+
+.gradient-editor .tools svg {
+	filter:invert(100%) grayscale(100%);
+}
