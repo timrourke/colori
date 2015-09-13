@@ -8,6 +8,7 @@
 	transition:transform 0.3s ease-in-out;
 	background-color:$softgrey;
 	z-index:2000;
+	padding-bottom:14em;
 }
 
 .gradient-social.gradient-social--open {
@@ -50,6 +51,8 @@ h6.gradient-byline {
 
 .gradient-social__comments {
 	padding:1em;
+	overflow-y:scroll;
+	height:100%;
 }
 
 .gradient-comment-form {
@@ -84,9 +87,20 @@ h6.gradient-byline {
 	line-height:2.5em;
 }
 
+.gradient-comments__list {
+	list-style-type:none;
+	padding:0;
+	margin:0;
+	font-size:0.8em;
+}
+
 .gradient-comment__author-card__avatar {
 	height:0.8em;
 	width:0.8em;
 	float:left;
 	margin:0.25em 0.25em 0.2em 0;
+}
+
+comment-directive {
+	display:block;
 }

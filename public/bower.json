@@ -19,7 +19,9 @@
     "angular-jwt": "~0.0.9",
     "angular-route": "~1.4.5",
     "angular-ui-router": "~0.2.15",
+    "lodash": "~3.10.1",
     "modernizr": "~2.8.3",
-    "ngstorage": "~0.3.9"
+    "ngstorage": "~0.3.9",
+    "velocity": "~1.2.2"
   }
 }

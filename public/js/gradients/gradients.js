@@ -21,6 +21,13 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 				}, function(err){
 					error(err.data);
 				});
+			},
+			postComment: function(permalink, comment, success, error){
+				$http.post(urls.BASE + '/gradients/' + permalink + '/comment', comment).then(function(res){
+					success(res.data);
+				}, function(err){
+					error(err.data);
+				});
 			}
 		}
 	}])
@@ -90,9 +97,7 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 			}
 		}
 
-		$scope.pushColorStop = function() {
-			colorStopRegister.pushColorStop();
-		};
+		
 
 		/*
 		 *	UI States
@@ -109,6 +114,39 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 		$scope.toggleSocialPanel = function() {
 			$scope.showSocial = !$scope.showSocial;
 		}
+
+		/*
+		 *	Comments
+		 *
+		 */
+
+		 $scope.newComment = {
+		 	body: ''
+		 };
+
+		$scope.postComment = function(newComment){
+			gradientService.postComment(
+				$stateParams.permalink,
+				newComment,
+				function(res){
+					console.log(res);
+					$scope.newComment = {
+					 	body: ''
+					 };
+					$scope.gradient.Comments.push(res.commentCreated);
+				}, function(err){
+					console.log(err);
+				});
+		}
+
+		/*
+		 *	ColorStop Management
+		 *
+		 */
+
+		$scope.pushColorStop = function() {
+			colorStopRegister.pushColorStop();
+		};
 
 		$scope.increasePickerCount = colorStopRegister.increasePickerCount;
 
@@ -236,13 +274,14 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 			gradientService.getGradients(function(res){
 				console.log(res);
 				$scope.gradientItems = res.gradientsFound;
+				console.log($scope.gradientItems);
 			}, function(err){
 				console.log(err);
 				$rootScope.message = err.message;
 			});
 		}
 
-		$scope.sortOrder = '-hearts';
+		$scope.sortOrder = '';
 
 		$scope.init();
 
@@ -262,7 +301,8 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 			hearts: '=',
 			comments: '=',
 			gradient: '=',
-			permalink: '='
+			permalink: '=',
+			posted: '='
 		},
 		templateUrl: '/partials/directives/gradient-item.html',
 		link: function(scope, element, attributes) {

@@ -22,7 +22,7 @@ function bySortedLeftValue(obj, callback, context) {
     while (length--) callback.call(context, tuples[length][0], tuples[length][1]);
 }
 
-angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppGradients'])
+angular.module('coloriApp', ['ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
 	.constant('urls', {
 	  BASE: 'http://localhost:8080/api'
 	})

@@ -8,9 +8,9 @@
   					Sort by:
   					<div class="gradients-grid__nav-select select">
 						  <select ng-model="sortOrder">
-						    <option value="-posted">most recent.</option>
-						    <option value="-hearts" selected>most popular.</option>
-						    <option value="-comments">comments.</option>
+						    <option value="-posted" selected>most recent.</option>
+						    <option value="-hearts">most popular.</option>
+						    <option value="comments">comments.</option>
 						  </select>
 						</div>
   				</label>
@@ -19,7 +19,7 @@
   	</header>
   	<div class="gradients-grid__gradients col-group">
   		<div ng-repeat="gradientItem in gradientItems | orderBy:sortOrder">
-  			<gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink"></gradient-item>
+  			<gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.Comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink" posted="gradientItem.createdAt"></gradient-item>
   		</div>
   	</div>
   </div>

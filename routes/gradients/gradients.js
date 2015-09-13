@@ -21,7 +21,18 @@ module.exports = function (Models) {
   var router = new Router();
 
   router.route('/').get(function(req, res, next) {
-    Gradient.findAll({ include: [{ model: User }, { model: Comment }] }).then(function(gradients) {
+    Gradient.findAll({ 
+      include: [
+        { 
+          model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'] 
+        }, 
+        { 
+          model: Comment, 
+            include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+              include: [{ model: UserProfile }] 
+            }] 
+        }] 
+      }).then(function(gradients) {
       
       if (gradients.length == 0) {
         res.status(404).json({ success: false, message: 'No gradients found.' });
@@ -40,15 +51,24 @@ module.exports = function (Models) {
   });
 
   router.route('/:permalink').get(function(req, res, next) {
-    Gradient.findOne({ where: { permalink: req.params.permalink }, include: [{ model: User }, { model: Comment }] }).then(function(gradient) {
+    Gradient.findOne({ 
+      where: { permalink: req.params.permalink }, 
+      include: [
+        { 
+          model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'] }, 
+          { 
+            model: Comment, 
+            include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+              include: [{ model: UserProfile }]
+            }] 
+          }] 
+        }).then(function(gradient) {
 
       if (!gradient) {
         res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
       } else {
 
         gradient.User.dataValues = _.omit(gradient.User.dataValues, ['password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid']);
-
-        console.log(gradient.User);
 
         res.status(200).json({
           success: true,
@@ -64,7 +84,15 @@ module.exports = function (Models) {
   });
 
   router.route('/:permalink/comment').post(function(req, res, next) {
-    Gradient.findOne({ where: { permalink: req.params.permalink }, include: [{ model: User }, { model: Comment }] }).then(function(gradient) {
+    Gradient.findOne({ where: { permalink: req.params.permalink }, 
+      include: [{ 
+        model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt']  
+      }, { 
+        model: Comment, 
+        include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+          include: [{ model: UserProfile }] 
+        }] 
+      }] }).then(function(gradient) {
 
       if (!gradient) {
         res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
@@ -85,13 +113,25 @@ module.exports = function (Models) {
 
               comment.setUser(author).then(function(authoredComment){
 
-                gradient.addComment(authoredComment).then(function(savedComment){
-                  res.status(200).json({
-                    success: true,
-                    message: 'Comment created.',
-                    commentCreated: savedComment
-                  }); 
-                }).then(function(err){
+                gradient.addComment(authoredComment).then(function(savedGradientWithComment){
+
+                  author.getUserProfile().then(function(completeUser){
+
+                    author.dataValues.UserProfile = completeUser;
+                    authoredComment.dataValues.User = author;
+
+                    res.status(200).json({
+                      success: true,
+                      message: 'Comment created.',
+                      commentCreated: authoredComment 
+                    });
+
+                  }).catch(function(err){
+                    console.log(err);
+                    return next(err);
+                  });
+
+                }).catch(function(err){
                   console.log(err);
                   return next(err);
                 });

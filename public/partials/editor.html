@@ -18,16 +18,13 @@
       <header class="gradient-comments__header">
         {{(gradient.Comments.length) ? gradient.Comments.length + ' comments:' : 'No comments.' }}
       </header>
-      <ul class="gradient-comments__list" ng-repeat="comment in gradient.Comments">
-        <li class="gradient-comments__list-item">
-          <article class="gradient-comment">
-            <p>{{comment.body}}</p>
-          </article>
+      <ul class="gradient-comments__list">
+        <li class="gradient-comments__list-item" ng-repeat="comment in gradient.Comments">
+          <comment-directive body="comment.body" author="comment.User.username"></comment-directive>
         </li>
       </ul>
-
     </div>
-    <form ng-show="user" class="gradient-comment-form" ng-click="postComment(newComment)">
+    <form ng-show="user" class="gradient-comment-form" ng-submit="postComment(newComment)">
       <textarea ng-model="newComment.body"></textarea>
       <div class="gradient-comment__input clearfix">
         <div class="gradient-comment__current-user">
