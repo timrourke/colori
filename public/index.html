@@ -50,21 +50,21 @@
       
       <div ng-if="user" class="site-user">
         <img ng-if="user.UserProfile.avatar_url != undefined" class="site-user__avatar" src="{{user.UserProfile.avatar_url}}" alt="{{user.username}}" />
+        <a ui-sref="user({ username: user.username })">
         <svg ng-if="user.UserProfile.avatar_url == null" class="icon site-user__avatar" viewBox="0 0 600 600">
           <use xlink:href="#anonymous_user" />
         </svg>
+        </a>
       </div>
       <a class="site-nav__logout" ng-show="user" href="#0" ng-click="logout()">Log out</a>
     </header>
 
     <main ui-view></main>
 
-    <footer class="site-footer">
+  </div>  
+      <footer class="site-footer">
       <span class="copyright">Colori &copy; 2015 Tim Rourke</span>
     </footer>
-    <div class="modal" ui-view="login"></div>
-    <div class="modal" ui-view="signup"></div>
-  </div>  
 
   <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700' rel='stylesheet' type='text/css'>
   <script src="/js/vendor/vendor.js"></script>
@@ -76,6 +76,7 @@
   <script src="/js/gradients/gradients.js"></script>
   <script src="/js/animator/animator.js"></script>
   <script src="/js/comments/comments.js"></script>
+  <script src="/js/users/users.js"></script>
   <script src="/js/app.js"></script>
 
 </body>

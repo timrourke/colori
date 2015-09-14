@@ -22,7 +22,7 @@ function bySortedLeftValue(obj, callback, context) {
     while (length--) callback.call(context, tuples[length][0], tuples[length][1]);
 }
 
-angular.module('coloriApp', ['ngAnimate', 'ngMaterial', 'angularMoment', 'ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
+angular.module('coloriApp', ['ngAnimate', 'ngMaterial', 'angularMoment', 'ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppUsers', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
 	.constant('urls', {
 	  BASE: 'http://localhost:8080/api'
 	})
@@ -68,12 +68,20 @@ angular.module('coloriApp', ['ngAnimate', 'ngMaterial', 'angularMoment', 'ngStor
 	      templateUrl: '/partials/users.html',
 	      controller: 'UsersController'
 	    }).
-	    state('users.detail', {
-	      url: '/:username',
-	      templateUrl: '/partials/users.detail.html',
+	    state('user', {
+	      url: '/users/:username',
+	      templateUrl: '/partials/user.html',
 	      controller: 'UserController'
 	    });
 
 	   $locationProvider.html5Mode(true);
 
 	}])
+.run(['$rootScope', 'colorStopRegister', function($rootScope, colorStopRegister){
+	$rootScope.$on('$stateChangeStart',
+    function(event, toState, toParams, fromState, fromParams){
+        if (toState.url == '/gradients/:permalink' || toState.url == '/editor') {
+        	colorStopRegister.setColorStops([]);
+        }
+    });
+}])

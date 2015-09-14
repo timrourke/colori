@@ -1,0 +1,158 @@
+<div class="user__wrapper">
+  <aside class="user-social" ng-class="{'user-social--open': showSocial, 'user-social--close': !showSocial}">
+    <header class="user-social__card col-group clearfix">
+      <div class="user-social__card__avatar">
+        <svg ng-if="user.UserProfile.avatar_url == null" class="site-user__avatar" viewBox="0 0 600 600">
+          <use xlink:href="#anonymous_user" />
+        </svg>
+
+        <button class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
+          <svg ng-if="user.UserProfile.avatar_url == null" viewBox="0 0 600 600">
+            <use xlink:href="#gear" />
+          </svg>  
+        </button>
+        
+      </div>
+      <div class="user-social__card__byline">
+        <h5 class="user-name">{{user.username}}</h5>
+        <h6 class="user-location">Chicago, Illinois</h6>
+      </div>
+    </header>
+    <div class="user-social__comments">
+      <header class="user-comments__header">
+        {{(user.Comments.length) ? user.Comments.length + ' comments:' : 'No comments.' }}
+      </header>
+      <ul class="user-comments__list">
+        <li class="user-comments__list-item" ng-repeat="comment in user.Comments">
+          <comment-directive body="comment.body" author="comment.User.username" posted="comment.createdAt"></comment-directive>
+        </li>
+      </ul>
+    </div>
+    <form ng-show="user" class="user-comment-form" ng-submit="postComment(newComment)">
+      <textarea ng-model="newComment.body"></textarea>
+      <div class="user-comment__input clearfix">
+        <div class="user-comment__current-user">
+          <div class="user-comment__card__avatar">
+            <svg ng-if="user.UserProfile.avatar_url == null" class="icon site-user__avatar" viewBox="0 0 600 600">
+              <use xlink:href="#anonymous_user" />
+            </svg>
+          </div>
+          <em>Logged in as {{user.username}}. <a href="#0" ng-click="logout()">Log out?</a></em>
+        </div>
+        <input type="submit">  
+      </div>
+    </form>
+  </aside>
+  
+  <form ng-class="{'user__updateUser--open': showUpdateUserProfile, 'user__updateUser--close': !showUpdateUserProfile}" class="user__updateUser" ng-submit="updateUser(updatedUser)">
+
+    <button class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
+      <span class="icon">×</span> 
+    </button>
+
+    <div class="user__updateUser-wrapper">
+      <h3>Update User Info</h3> 
+
+      <div class="user__updateUser__accountDetails">
+        <h4>Account Details</h4>
+        <label>
+          Username
+          <input type="text" placeholder="Username" ng-model="updatedUser.username">
+        </label>
+        
+        <label>
+          Email
+          <input type="email" placeholder="Email" ng-model="updatedUser.email">  
+        </label>
+        
+        <label>
+          New Password
+          <input type="password" ng-model="updatedUser.password">
+        </label>
+        
+        <label ng-if="updatedUser.password.length">
+          Confirm New Password
+          <input type="password" ng-model="updatedUser.confirmpassword">  
+        </label>
+      </div>
+      
+      <div class="user__updateUser__userProfile">
+        <h4>User Profile</h4>
+
+        <label>
+          Avatar Image
+          <input type="file" accept="image/*" ng-model="updateUser.UserProfile.avatar_url">
+        </label>
+
+        <label>
+          Your website
+          <input type="url" placeholder="Your website's URL" ng-model="updatedUser.UserProfile.website">
+        </label>
+
+        <label>
+          Bio
+          <textarea ng-model="updatedUser.UserProfile.bio"></textarea>
+        </label>
+      </div>
+
+      <div class="user__updateUser__userProfile2">
+        <h4>Social Links</h4>
+
+        <label>
+          Twitter Handle
+          <input type="text" placeholder="@YourTwitterHandle" ng-model="updatedUser.UserProfile.twitter_handle">
+        </label>
+
+        <label>
+          Your Facebook Profile
+          <input type="url" placeholder="URL to your Facebook profile" ng-model="updatedUser.UserProfile.facebook_handle">
+        </label>
+
+        <label>
+          Your GitHub Profile
+          <input type="url" placeholder="URL to your GitHub profile" ng-model="updatedUser.UserProfile.github_handle">
+        </label>
+
+        <label>
+          Your Dribble Profile
+          <input type="url" placeholder="URL to your Dribble profile" ng-model="updatedUser.UserProfile.dribble_handle">
+        </label>
+
+        <label>
+          Your CodePen Profile
+          <input type="url" placeholder="URL to your CodePen profile" ng-model="updatedUser.UserProfile.codepen_handle">
+        </label>
+      </div>
+    </div>
+
+    <input type="submit" value="Update">
+  </form>
+
+  <section class="gradients">
+    <div class="gradients-grid col-group">
+      <header class="gradients-grid__header">
+        <nav class="gradients-grid__nav">
+          <span class="gradients-grid__nav-title">Showing all gradients.</span>
+          <form class="gradients-grid__nav-sort">
+            <label>
+              Sort by:
+              <div class="gradients-grid__nav-select select">
+                <select ng-model="sortOrder">
+                  <option value="-posted" selected>most recent.</option>
+                  <option value="-hearts">most popular.</option>
+                  <option value="comments">comments.</option>
+                </select>
+              </div>
+            </label>
+          </form>
+        </nav>
+      </header>
+      
+      <div class="gradients-grid__gradients col-group">
+        <div ng-repeat="gradientItem in gradientItems | orderBy:sortOrder">
+          <gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.Comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink" posted="gradientItem.createdAt" title="gradientItem.title"></gradient-item>
+        </div>
+      </div>  
+    </div>
+  </section>
+</div>

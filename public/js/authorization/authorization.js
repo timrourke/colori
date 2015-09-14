@@ -1,4 +1,4 @@
-angular.module('coloriAppAuthorization', ['ngStorage', 'ui.router', 'angular-jwt'])
+angular.module('coloriAppAuthorization', [])
 .factory('Auth', ['$rootScope', '$http', '$localStorage', 'urls', '$location', function($rootScope, $http, $localStorage, urls, $location) {
   
 	  return {
@@ -57,31 +57,6 @@ angular.module('coloriAppAuthorization', ['ngStorage', 'ui.router', 'angular-jwt
 	    }
 	  };
 
-	}])
-	.factory('Users', ['$http', 'urls', function($http, urls) {
-	  return {
-	    getUsers: function(success, error) {
-	      $http.get(urls.BASE + '/users').then(function(res){
-	        success(res.data);
-	      }, function(err) {
-	        error(err.data);
-	      });
-	    },
-	    getUser: function(username, success, error) {
-	      $http.get(urls.BASE + '/users/' + username).then(function(res){
-	        success(res.data);
-	      }, function(err) {
-	        error(err.data);
-	      });
-	    },
-	    updateUser: function(username, updatedUser, success, error) {
-	      $http.put(urls.BASE + '/users/' + username, updatedUser).then(function(res){
-	        success(res.data);
-	      }, function(err){
-	        error(err.data);
-	      });
-	    }
-	  }
 	}])
   .factory('LoginFailed', ['$mdDialog', function($mdDialog){
 
@@ -149,64 +124,3 @@ angular.module('coloriAppAuthorization', ['ngStorage', 'ui.router', 'angular-jwt
     });
   };
 }])
-.controller('UsersController', ['$rootScope', '$scope', '$stateParams', 'Users', function($rootScope, $scope, $stateParams, Users) {
-
-  $scope.users = [];
-
-  $scope.init = function() {
-    Users.getUsers(function(res) {
-      $scope.users = res.foundUsers;
-    }, function(err) {
-      $rootScope.message = err.message;
-    });
-  }
-
-  $scope.init();
-
-}])
-.controller('UserController', ['$rootScope', '$scope', 'Users', 'Auth', '$stateParams', function($rootScope, $scope, Users, Auth, $stateParams) {
-
-  $scope.users = [];
-
-  $scope.updatedUser = {
-    username: '',
-    password: ''
-  };
-
-  $scope.showForm = false;
-
-  $scope.init = function() {
-    Users.getUser(
-      $stateParams.username,
-      function(res) {
-        $scope.users[0] = res.foundUser;
-        if ($scope.users[0].id == Auth.getUser().id) {
-          return $scope.showForm = true;
-        }
-        $rootScope.message = res.message;
-      }, function(res) {
-        $rootScope.message = res.message;
-      }
-    );
-  }
-
-  $scope.init();
-
-  $scope.updateUser = function(updatedUser){
-    Users.updateUser($stateParams.username, updatedUser, function(res) {
-      $scope.users[0] = res.updatedUser;
-      $scope.updatedUser = {
-        username: '',
-        password: ''
-      };
-      $rootScope.message = res.message;
-      if (Auth.getUser().id == res.updatedUser.id) {
-        Auth.setUser(res.updatedUser);
-      }
-    }, function(err) {
-      $scope.updatedUser = '';
-      $rootScope.message = err.message;
-    });
-  }
-
-}]);

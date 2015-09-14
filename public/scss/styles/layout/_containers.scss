@@ -9,12 +9,13 @@ html, body {
 
 main {
   @extend .clearfix;
-  position:absolute;
   top:0;
   left:0;
   width:100%;
   height:100%;
   z-index:100;
+  padding-top: 2.5em;
+  //overflow-y:scroll;
 }
 
 .site-wrapper {
@@ -23,6 +24,9 @@ main {
   height:auto !important;
   height:100%;
   overflow:hidden;
+  margin:0 0 -1.5em 0;
+  background-color:$background-color;
+  padding-bottom:1.5em;
 }
 
 .wrapper {

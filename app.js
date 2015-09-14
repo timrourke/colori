@@ -6,13 +6,28 @@ var logger            = require('morgan');
 var onFinished        = require('on-finished');
 var bodyParser        = require('body-parser');
 var Sequelize         = require('sequelize');
+var AWS               = require('aws-sdk');
+
+
+//  Config AWS
+AWS.config.loadFromPath(path.join(__dirname, 'config', 'aws_config.js'));
+var s3bucket = new AWS.S3({ params: {Bucket: 'colori'} });
+
+var params = {Key: 'myKey', Body: 'Hello!'};
+// s3bucket.upload(params, function(err, data) {
+//     if (err) {
+//       console.log("Error uploading data: ", err);
+//     } else {
+//       console.log("Successfully uploaded data to myBucket/myKey");
+//     }
+// });
 
 debug('Initializing express.');
 var app = express();
 
-var NotFoundError       = require(path.join(__dirname, 'errors', 'NotFoundError.js'));
-var tokenUtils          = require(path.join(__dirname, 'utils', 'tokenUtils.js'));
-var unless              = require('express-unless');
+var NotFoundError     = require(path.join(__dirname, 'errors', 'NotFoundError.js'));
+var tokenUtils        = require(path.join(__dirname, 'utils', 'tokenUtils.js'));
+var unless            = require('express-unless');
 
 var config            = require(path.join(__dirname, 'config', 'config')); // get our config file
 

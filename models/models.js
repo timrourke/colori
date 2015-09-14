@@ -23,7 +23,13 @@ module.exports = function(sequelize, Sequelize) {
 				} 
 			}},
 		twitter_handle: 					{ type: Sequelize.STRING, defaultValue: null },
-		facebook_handle: 					{ type: Sequelize.STRING, defaultValue: null },
+		facebook_handle: 					{ type: Sequelize.STRING,
+			validate: { 
+				isUrl: {
+					args: true,
+					msg: 'Sorry, that does not appear to be a valid URL. Please check for errors and try again.'
+				} 
+			}},
 		github_handle: 						{ type: Sequelize.STRING,
 			validate: { 
 				isUrl: {

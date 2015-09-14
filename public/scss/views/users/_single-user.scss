@@ -1,0 +1,243 @@
+.user__wrapper {
+  position: absolute;
+  top: 2.5em;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+.user__wrapper .gradients {
+	
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+
+.user-social {
+	position:absolute;
+	top:0;
+	left:0;
+	width:320px;
+	height:100%;
+	transform:translateX(-320px);
+	transition:transform 0.3s ease-in-out;
+	background-color:$softgrey;
+	z-index:2000;
+	margin-bottom:1.5em;
+}
+
+.user-social.user-social--open {
+	transform:translateX(0);
+}
+
+.user-editor.user-social--open {
+	transform:translateX(320px);
+}
+
+.site-user__toggleProfile {
+	position:absolute;
+	background:transparent;
+	border:none;
+	width:1em;
+	height:1em;
+	top:0;
+	right:0.5em;
+	padding:0;
+}
+
+.site-user__toggleProfile svg {
+	position:absolute;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+}
+
+.site-user__toggleProfile .icon {
+	font-size:1em;
+	text-align:center;
+}
+
+.user-social__card {
+	background-color:rgba(0,0,0,0.2);
+	padding:1em;
+}
+
+.user-social__card__avatar {
+	width:2.5em;
+	height:2.5em;
+	float:left;
+}
+
+.user-social__card__byline {
+	float:left;
+	padding-left:0.5em;
+}
+
+.user-name {
+	margin-bottom:.225em;
+}
+
+.user-location {
+	font-size:0.8em;
+	font-weight: 300;
+	color:$lightgrey;
+}
+
+.user-social__comments {
+	position:relative;
+	padding:1em;
+	overflow-y:scroll;
+}
+
+.user-comments__header {
+	margin-bottom:0.8em;
+}
+
+.user-comment-form {
+	position:absolute;
+	bottom:3.5em;
+	margin-bottom:0;
+	width:100%;
+	background-color:$darkgrey;
+}
+
+.user-comment-form textarea {
+	margin:0 0 u(0.5rem) 0;
+}
+
+.user-comment__input {
+	@extend .clearfix;
+	height:1.5em;
+}
+
+.user-comment__input input[type="submit"] {
+	font-size:0.6em;
+	float:right;
+	height:2.5em;
+	line-height:1.8em;
+	padding-left:0.5em;
+	padding-right:0.5em;
+	margin:0;
+}
+
+.user-comment__current-user em {
+	font-size:0.5em;
+	float:left;
+	line-height:2.5em;
+}
+
+.user-comments__list {
+	list-style-type:none;
+	padding:0;
+	margin:0;
+	font-size:0.8em;
+}
+
+.user-comment__card__avatar {
+	height:0.8em;
+	width:0.8em;
+	float:left;
+	margin:0.25em 0.25em 0.2em 0;
+}
+
+.user-comment__header {
+	@extend .clearfix;
+}
+
+.user-comment__author-avatar {
+	width:3em;
+	height:3em;
+	float:left;
+}
+
+.user-comment__meta,
+.user-comment__author,
+.user-comment__date {
+	float:left;
+	margin-left:0.325em;
+}
+
+.user-comment__meta {
+	@extend .clearfix;
+	padding-top:0.25em;
+}
+
+.user-comment__author {
+	font-weight:400;
+}
+
+.user-comment__date {
+	clear:left;
+	color:$lightgrey;
+}
+
+.user-comment__body {
+	margin-top:0.8em;
+	margin-bottom:0;
+}
+
+comment-directive {
+	display:block;
+	font-size:0.8em;
+	padding:1em 0;
+	border-top:1px solid rgba(0,0,0,0.2);
+}
+
+.user__updateUser {
+	@include layout(12 0.5 split);
+	@extend .clearfix;
+	font-size:0.8em;
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	transform:translateY(-125%);
+	opacity:0;
+	transition:all 0.3s ease-in-out;
+	z-index:2000;
+	background-color:$darkgrey;
+	box-shadow:inset 0 0 7px rgba(0,0,0,0.25);
+}
+
+.user__updateUser-wrapper {
+	@extend .clearfix;
+	width:100%;
+	max-width:50em;
+	margin:0 auto;
+}
+
+.user__updateUser.user__updateUser--open {
+	transform:translateY(0);
+	opacity:1;
+}
+
+.user__updateUser__accountDetails {
+	@include span(4 of 12);
+}
+
+.user__updateUser__userProfile {
+	@include span(4 of 12);
+}
+
+.user__updateUser__userProfile2 {
+	@include span(4 of 12 last);
+}
+
+.user__updateUser label input {
+	margin-top:0.125em;
+}
+
+.user__updateUser input {
+	width:100%;
+}
+
+.user__updateUser input[type="submit"] {
+	max-width:8em;
+	display:block;
+	margin-left:auto;
+	margin-right:auto;
+}

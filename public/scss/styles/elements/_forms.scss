@@ -75,7 +75,7 @@ input[type="password"],
 input[type="search"],
 input[type="number"] {
   position:relative;
-  height:u(2.5rem);
+  height:2.5em;
   border:0;
   border-radius:0;
   display:inline-block;
@@ -200,7 +200,7 @@ button,
   font-size:1em;
   font-weight:400;
   text-transform:lowercase;
-  height:u(2.5rem);
+  height:2.5em;
   margin: $typl8-indent-val/2 auto;
   padding:0 1.25em 0 1.25em;
   display: inline-block;
@@ -251,25 +251,25 @@ button {
 .control {
   position: relative;
   display: inline-block;
-  padding-left: u(1.5rem);
+  padding-left: 1.5em;
   line-height:1.75;
   cursor: pointer;
 }
 .control input {
   position: absolute;
   left:0;
-  top:u(0.25rem);
+  top:0.25em;
   opacity: 0;
   z-index: -1; /* Put the input behind the label so it doesn't overlay text */
 }
 .control-indicator {
   position: absolute;
-  top: u(.25rem);
+  top: .25em;
   left: 0;
   display: block;
-  width:  u(1rem);
-  height: u(1rem);
-  line-height: u(1rem);
+  width:  1em;
+  height: 1em;
+  line-height: 1em;
   font-size: 65%;
   color: #eee;
   border: u(.075rem) solid #ddd;
@@ -311,7 +311,7 @@ button {
 
 /* Checkbox modifiers */
 .checkbox .control-indicator {
-  border-radius: u(.25rem);
+  border-radius: .25em;
 }
 .checkbox input:checked ~ .control-indicator {
   background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgOCA4IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA4IDgiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTYuNCwxTDUuNywxLjdMMi45LDQuNUwyLjEsMy43TDEuNCwzTDAsNC40bDAuNywwLjdsMS41LDEuNWwwLjcsMC43bDAuNy0wLjdsMy41LTMuNWwwLjctMC43TDYuNCwxTDYuNCwxeiINCgkvPg0KPC9zdmc+DQo=);
@@ -340,7 +340,7 @@ button {
  */
 
 .select {
-  height:u(2.5rem);
+  height:2.5em;
   position: relative;
   display: block;
   float:left;
@@ -350,7 +350,7 @@ button {
   display: inline-block;
   width: 100%;
   margin: 0;
-  padding: u(0.5rem) u(2.25rem) u(.5rem) u(1rem);
+  padding: 0.5em 2.25em .5em 1em;
   background-color: #eee;
   border: 0;
   border-radius:0;
@@ -368,17 +368,17 @@ button {
 .select:after {
   position: absolute;
   top: 50%;
-  right: u(1.25rem);
+  right: 1.25em;
   display: inline-block;
   content: "";
   width: 0;
   height: 0;
-  margin-top: u(-.15rem);
+  margin-top: -.15em;
   pointer-events: none;
-  border-top: u(.35rem) solid;
-  border-right: u(.35rem) solid transparent;
-  border-bottom: u(.35rem) solid transparent;
-  border-left: u(.35rem) solid transparent;
+  border-top: .35em solid;
+  border-right: .35em solid transparent;
+  border-bottom: .35em solid transparent;
+  border-left: .35em solid transparent;
 }
 
 /* Hover state */
@@ -412,7 +412,7 @@ button {
   .select select {
     text-indent: 0.01px;
     text-overflow: '';
-    padding-right: u(1rem);
+    padding-right: 1em;
   }
 
   /* <option> elements inherit styles from <select>, so reset them. */
@@ -425,7 +425,7 @@ button {
 @media screen and (min-width:0\0) {
   .select select {
     z-index: 1;
-    padding: u(.5rem) u(1.5rem) u(.5rem) u(1rem);
+    padding: .5em 1.5em .5em 1em;
   }
   .select:after {
     z-index: 5;
@@ -433,12 +433,12 @@ button {
   .select:before {
     position: absolute;
     top: 0;
-    right: u(1rem);
+    right: 1em;
     bottom: 0;
     z-index: 2;
     content: "";
     display: block;
-    width: u(1.5rem);
+    width: 1.5em;
     background-color: #eee;
   }
   .select select:hover,
@@ -461,10 +461,10 @@ button {
   display: block;
   float:left;
   cursor: pointer;
-  height: u(2.5rem);
+  height: 2.5em;
 }
 .file input {
-  min-width: u(14rem);
+  min-width: 14rem;
   margin: 0;
   filter: alpha(opacity=0);
   opacity: 0;
@@ -475,8 +475,8 @@ button {
   right: 0;
   left: 0;
   z-index: 5;
-  height: u(2.5rem);
-  padding: u(.5rem) u(1rem);
+  height: 2.5em;
+  padding: .5em 1em;
   background-color: #fff;
   border: u(.075rem) solid #ddd;
   box-shadow: inset 0 u(.2rem) u(.4rem) rgba(0,0,0,.05);
@@ -496,8 +496,8 @@ button {
   z-index: 6;
   display: block;
   content: "Browse";
-  height: u(2.5rem);
-  padding: u(.5rem) u(1rem);
+  height: 2.5em;
+  padding: .5em 1em;
   background-color: #eee;
   border: u(.075rem) solid #ddd;
 }
@@ -515,7 +515,7 @@ button {
 
 .progress {
   display: inline-block;
-  height: u(1rem);
+  height: 1em;
 }
 .progress[value] {
   /* Reset the default appearance */
@@ -563,8 +563,8 @@ button {
   }
   .progress-bar {
     display: inline-block;
-    height: u(1rem);
-    text-indent: -999rem; /* Simulate hiding of value as in native `<progress>` */
+    height: 1em;
+    text-indent: -999em; /* Simulate hiding of value as in native `<progress>` */
     background-color: $active-input-color;
     border-top-left-radius: u(.2rem);
     border-bottom-left-radius: u(.2rem);
@@ -581,7 +581,7 @@ button {
  */
 
 .controls-stacked {
-  margin: u(1rem) 0;
+  margin: 1em 0;
 }
 .controls-stacked .control,
 .controls-stacked .progress {
@@ -589,16 +589,16 @@ button {
 }
 .controls-stacked .control + .control,
 .controls-stacked .progress + .progress {
-  margin-top: u(.5rem);
+  margin-top: .5em;
 }
 
 .controls-inline {
-  margin: u(1rem) 0;
+  margin: 1em 0;
 }
 .controls-inline .control {
   display: inline-block;
-  height: u(1rem);
+  height: 1em;
 }
 .controls-inline .control + .control {
-  margin-left: u(1rem);
+  margin-left: 1em;
 }

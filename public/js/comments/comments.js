@@ -1,4 +1,4 @@
-angular.module('coloriAppComments', ['coloriAppAnimator'])
+angular.module('coloriAppComments', [])
 .directive('commentDirective', ['animator', function(animator){
 	return {
 		restrict: 'E',

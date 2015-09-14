@@ -38,9 +38,11 @@ module.exports = function (Models) {
 
   var findUserByUsername = function(username, callback) {
     User.findOne({ 
-      username: username, 
+      where: { username: username }, 
       include: { model: UserProfile }, 
       attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'] }).then(function(user) {
+
+        console.log(user.username);
 
       if (!user) {
         return callback(null, null);        
@@ -62,7 +64,7 @@ module.exports = function (Models) {
   }
 
   var findUserByUsernameAndUpdate = function(username, updatedUserProperties, req, res, callback) {
-    User.findOne({ username: username }).then(function(user) {
+    User.findOne({ where: { username: username }, include: { model: UserProfile } }).then(function(user) {
 
       if (!user) {
         return callback(null, null);        
@@ -74,17 +76,72 @@ module.exports = function (Models) {
             res.status(449).json({ success: false, message: "Sorry, your password was not changed. The new password must match the confirmation password." })
           }
 
-          user.update(updatedUserProperties, { fields: [ 'username', 'email', 'password' ] }).then(function(updatedUser) {
+          if (!updatedUserProperties.password) {
+            user.update(updatedUserProperties, { fields: [ 'username', 'email' ] }).then(function(updatedUser) {
       
-            if (!updatedUser || updatedUser == null) {
-              return callback(null, null);
-            } else {
-              return callback(null, updatedUser);
-            }
+              if (!updatedUser || updatedUser == null) {
+                return callback(null, null);
+              } else {
 
-          }).catch(function(err){
-            return callback(err);
-          });
+                updatedUser.getUserProfile().then(function(updatedUserProfile){
+
+                  updatedUserProfile.update(updatedUserProperties.UserProfile).then(function(finalUpdatedUserProfile){
+
+                    updatedUser.dataValues.UserProfile = finalUpdatedUserProfile;
+
+                    return callback(null, updatedUser);
+
+                  }).catch(function(err){
+                    console.log(err);
+                    return callback(err);
+                  });
+
+                }).catch(function(err){
+                  console.log(err);
+                  return callback(err);
+                });
+                
+              }
+
+            }).catch(function(err){
+              console.log(err);
+              return callback(err);
+            });
+
+          } else {
+            user.update(updatedUserProperties, { fields: [ 'username', 'email', 'password' ] }).then(function(updatedUser) {
+      
+              if (!updatedUser || updatedUser == null) {
+                return callback(null, null);
+              } else {
+
+                updatedUser.getUserProfile().then(function(updatedUserProfile){
+
+                  updatedUserProfile.update(updatedUserProperties.UserProfile).then(function(finalUpdatedUserProfile){
+
+                    updatedUser.dataValues.UserProfile = finalUpdatedUserProfile;
+
+                    return callback(null, updatedUser);
+
+                  }).catch(function(err){
+                    console.log(err);
+                    return callback(err);
+                  });
+
+                }).catch(function(err){
+                  console.log(err);
+                  return callback(err);
+                });
+                
+              }
+
+            }).catch(function(err){
+              console.log(err);
+              return callback(err);
+            });
+          }
+
+          
         });
       }
 

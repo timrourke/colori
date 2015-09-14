@@ -1,4 +1,4 @@
-angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'draggableModule'])
+angular.module('coloriAppGradients', [])
 .factory('gradientService', ['$http', 'urls', function($http, urls){
 		return {
 			getGradients: function(success, error){
@@ -58,6 +58,9 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 			},
 			setColorStops: function(newColorStops) {
 				colorStops = newColorStops;
+				if (!newColorStops.length) {
+					pickerCount = 0;
+				}
 			},
 			getColorStops: function() {
 				return colorStops;
@@ -146,9 +149,9 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 		 *
 		 */
 
-		 $scope.newComment = {
+		$scope.newComment = {
 		 	body: ''
-		 };
+		};
 
 		$scope.postComment = function(newComment){
 			gradientService.postComment(
@@ -308,7 +311,6 @@ angular.module('coloriAppGradients', ['ui.router', 'colorpicker.module', 'dragga
 				console.log($scope.gradientItems);
 			}, function(err){
 				console.log(err);
-				$rootScope.message = err.message;
 			});
 		}
 
