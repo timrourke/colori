@@ -9,7 +9,9 @@ var debug = require('debug')('app:routes:authorization' + process.pid),
     tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils')),
     userUtils = require(path.join(__dirname, '..', '..', 'utils', 'userUtils')),
     Router = require("express").Router,
-    UnauthorizedAccessError = require(path.join(__dirname, '..', '..', 'errors', 'UnauthorizedAccessError.js'));
+    UnauthorizedAccessError = require(path.join(__dirname, '..', '..', 'errors', 'UnauthorizedAccessError.js')),
+    mailer = require(path.join(__dirname, '..', '..', 'mailer', 'mailer')),
+    uuid = require('uuid');
 
 module.exports = function (Models) {
 
@@ -72,6 +74,7 @@ module.exports = function (Models) {
         username: req.body.username,
         password: req.body.password,
         email: req.body.email,
+        email_verification_uuid: uuid.v4(),
         is_admin: false
     }
     
@@ -100,7 +103,16 @@ module.exports = function (Models) {
           User.create(newUser).then(function(user) {
             console.log('User saved successfully with ID of ' + user.id);
 
-            userUtils.createUserProfile(Models, user, req, res, next);
+            mailer.confirmEmail(user, function(err, result){
+              if (err) return next(err);
+
+              userUtils.createUserProfile(Models, user, req, res, function(err, newUserProfile){
+                if (err) return next(err);
+
+                next(null, user);
+              });
+            });
+
           }).catch(function(err){
             //Failed to save to database.
             console.log(err);
@@ -120,12 +132,13 @@ module.exports = function (Models) {
 
   var router = new Router();
 
-  router.route("/signup").post(signup, function (req, res, next) {
+  router.route("/signup").post(signup, function (err, user, req, res, next) {
+    if (err) throw err;
 
-      return res.status(200).json({
-        user: req.user,
-        message: 'User successfully created.'
-      });  
+    return res.status(200).json({
+      user: user.username,
+      message: 'Welcome, ' + user.username + '! Your account was created. Please check your email for a confirmation message to activate your account.'
+    });  
 
   });
 

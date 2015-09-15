@@ -32,7 +32,7 @@ module.exports.createUserProfile = function (Models, user, req, res, next) {
 
                 debug("User profile generated for user: %s", user.username);
 
-                tokenUtils.create(user, req, res, next);
+                next(null, assignedNewUserProfile);
             }).catch(function(err){
                 console.log(err);
                 return next(err);
