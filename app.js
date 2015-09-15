@@ -46,7 +46,7 @@ var sequelize = new Sequelize('colori', 'timrourke-wdi', '', {
 
 // Define Models
 var Models = require(path.join(__dirname, 'models', 'models.js'))(sequelize, Sequelize);
-sequelize.sync({ force: true });
+sequelize.sync();
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -111,6 +111,7 @@ app.use(function (err, req, res, next) {
         case "BadRequestError":
         case "UnauthorizedAccessError":
         case "NotFoundError":
+        case "AccountUnactivatedError":
             code = err.status;
             msg = err.inner;
             break;

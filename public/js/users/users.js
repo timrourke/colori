@@ -21,6 +21,13 @@ angular.module('coloriAppUsers', [])
       }, function(err){
         error(err.data);
       });
+    },
+    confirmEmailVerificationUUID: function(uuid, success, error) {
+      $http.get(urls.BASE + '/auth/confirm-email/' + uuid).then(function(res){
+        success(res.data);
+      }, function(err) {
+        error(err.data);
+      });
     }
   }
 }])
@@ -134,5 +141,24 @@ angular.module('coloriAppUsers', [])
       file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
     });
   }
+
+}]).controller('ConfirmEmailController', ['$scope', '$stateParams', '$location', 'Users',  function($scope, $stateParams, $location, Users){
+
+  $scope.init = function() {
+    if (!$stateParams.email_verification_uuid) {
+      $location.path('/');
+    } else if ($stateParams.email_verification_uuid != '') {
+      Users.confirmEmailVerificationUUID($stateParams.email_verification_uuid,
+        function(res){
+          console.log(res);
+          $location.path('/login');
+        }, function(err){
+          console.log(err);
+          $location.path('/');
+        });
+    }
+  }
+
+  $scope.init();
 
 }])

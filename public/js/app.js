@@ -72,6 +72,10 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
 	      url: '/users/:username',
 	      templateUrl: '/partials/user.html',
 	      controller: 'UserController'
+	    }).
+	    state('confirm-email', {
+	    	url: '/confirm-email/:email_verification_uuid',
+	    	controller: 'ConfirmEmailController'
 	    });
 
 	  $locationProvider.html5Mode(true);

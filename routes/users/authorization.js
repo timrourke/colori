@@ -10,6 +10,7 @@ var debug = require('debug')('app:routes:authorization' + process.pid),
     userUtils = require(path.join(__dirname, '..', '..', 'utils', 'userUtils')),
     Router = require("express").Router,
     UnauthorizedAccessError = require(path.join(__dirname, '..', '..', 'errors', 'UnauthorizedAccessError.js')),
+    AccountUnactivatedError = require(path.join(__dirname, '..', '..', 'errors', 'AccountUnactivatedError.js')),
     mailer = require(path.join(__dirname, '..', '..', 'mailer', 'mailer')),
     uuid = require('uuid');
 
@@ -29,7 +30,7 @@ module.exports = function (Models) {
 
     if (_.isEmpty(username) || _.isEmpty(password)) {
       return next(new UnauthorizedAccessError("401", {
-        message: 'Invalid username or password'
+        message: 'Invalid username or password.'
       }));
     }
 
@@ -39,11 +40,17 @@ module.exports = function (Models) {
           where: {username: username},
           include: [{ model: UserProfile }]
       }).then(function (user) {  
-        console.log(user);
 
         if (!user || user.length == 0) {
           return next(new UnauthorizedAccessError("401", {
-            message: 'Invalid username or password'
+            message: 'Invalid username or password.'
+          }));
+        }
+
+        if (user.email_verified != true) {
+          console.log(user.email_verified)
+          return next(new AccountUnactivatedError("401", {
+            message: 'Sorry, you must verify your email to activate your account.'
           }));
         }
 
@@ -79,15 +86,15 @@ module.exports = function (Models) {
     }
     
     if (_.isEmpty(newUser.username)) {
-      res.status(400).json({ success: false, message: 'Signup failed. Username must not be blank.' });
+      return res.status(400).json({ success: false, message: 'Signup failed. Username must not be blank.' });
     }
 
     if (_.isEmpty(newUser.password)) {
-      res.status(400).json({ success: false, message: 'Signup failed. Password must not be blank.' });
+      return res.status(400).json({ success: false, message: 'Signup failed. Password must not be blank.' });
     }
 
     if (_.isEmpty(newUser.password)) {
-      res.status(400).json({ success: false, message: 'Signup failed. Email address must not be blank.' });
+      return res.status(400).json({ success: false, message: 'Signup failed. Email address must not be blank.' });
     }
 
     process.nextTick(function() {
@@ -116,7 +123,7 @@ module.exports = function (Models) {
           }).catch(function(err){
             //Failed to save to database.
             console.log(err);
-            next(err);
+            return next(err);
           });
 
         };
@@ -128,6 +135,30 @@ module.exports = function (Models) {
 
     });
 
+  }
+
+  var verifyUUID = function(req, res, next) {
+    User.findOne({ where: { email_verification_uuid: req.params.email_verification_uuid } }).then(function(user){
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Sorry, the email verification link you provided appears to be invalid.' });
+      } else if (user.email_verified == true) {
+        return next();
+      }
+
+      user.update({ email_verified: true, email_verification_uuid: null }).then(function(verifiedUser){
+
+        next();
+
+      }).catch(function(err){
+        console.log(err);
+        return next(err);
+      });
+
+    }).catch(function(err){
+      console.log(err);
+      return next(err);
+    });
   }
 
   var router = new Router();
@@ -159,6 +190,12 @@ module.exports = function (Models) {
 
   router.route("/login").post(authenticate, function (req, res, next) {
     return res.status(200).json({user: req.user });
+  });
+
+  router.route('/confirm-email/:email_verification_uuid').get(verifyUUID, function(req, res, next) {
+    return res.status(200).json({
+      "message": "Congratulations, you've activated your account!"
+    });
   });
 
   router.unless = require("express-unless");
