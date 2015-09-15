@@ -22,7 +22,7 @@ function bySortedLeftValue(obj, callback, context) {
     while (length--) callback.call(context, tuples[length][0], tuples[length][1]);
 }
 
-angular.module('coloriApp', ['ngAnimate', 'ngMaterial', 'angularMoment', 'ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppUsers', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
+angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angularMoment', 'ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppUsers', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
 	.constant('urls', {
 	  BASE: 'http://localhost:8080/api'
 	})
@@ -74,7 +74,7 @@ angular.module('coloriApp', ['ngAnimate', 'ngMaterial', 'angularMoment', 'ngStor
 	      controller: 'UserController'
 	    });
 
-	   $locationProvider.html5Mode(true);
+	  $locationProvider.html5Mode(true);
 
 	}])
 .run(['$rootScope', 'colorStopRegister', function($rootScope, colorStopRegister){

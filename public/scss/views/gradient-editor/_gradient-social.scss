@@ -8,7 +8,7 @@
 	transition:transform 0.3s ease-in-out;
 	background-color:$softgrey;
 	z-index:2000;
-	padding-bottom:14em;
+	padding-bottom:8em;
 }
 
 .gradient-social.gradient-social--open {
@@ -49,6 +49,50 @@ h6.gradient-byline {
 	}
 }
 
+.gradient-meta {
+	@extend .clearfix;
+	color:$lightgrey;
+	font-size:0.8em;
+	position:relative;
+	border-bottom:1px solid rgba(0,0,0,.2);
+	padding-bottom:1em;
+	margin-bottom:1em;
+}
+
+.gradient-meta__date {
+	display:block;
+	float:left;
+}
+
+.gradient-meta__wrapper {
+	position:relative;
+	top:-0.158em;
+	display:block;
+	float:right;
+}
+
+.gradient-meta .icon {
+	position:relative;
+	top:0.29em;
+	width:1.25em;
+	height:1.25em;
+	fill:transparent !important;
+	stroke-width:2;
+	margin-left:0.5em;
+}
+
+.gradient-meta .gradient__views {
+	stroke:$blue;
+}
+
+.gradient-meta .gradient__hearts {
+	stroke:$pink;
+}
+
+.gradient-meta .gradient__comments-counter {
+	stroke:$orange;
+}
+
 .gradient-social__comments {
 	padding:1em;
 	overflow-y:scroll;
@@ -57,6 +101,14 @@ h6.gradient-byline {
 
 .gradient-comments__header {
 	margin-bottom:0.8em;
+}
+
+.gradient-commentsCount {
+	font-weight:400;
+}
+
+.gradient-comments__list-item:first-of-type comment-directive {
+	border-top:none;
 }
 
 .gradient-comment-form {

@@ -8,6 +8,13 @@ angular.module('coloriAppGradients', [])
 					error(err.data);
 				});
 			},
+			getGradientsByUsername: function(username, success, error){
+				$http.get(urls.BASE + '/gradients/by/' + username).then(function(res){
+					success(res.data);
+				}, function(err){
+					error(err.data);
+				});
+			},
 			getGradient: function(permalink, success, error){
 				$http.get(urls.BASE + '/gradients/' + permalink).then(function(res){
 					success(res.data);
@@ -306,9 +313,8 @@ angular.module('coloriAppGradients', [])
 
 		$scope.init = function() {
 			gradientService.getGradients(function(res){
-				console.log(res);
+				console.log(res.gradientsFound);
 				$scope.gradientItems = res.gradientsFound;
-				console.log($scope.gradientItems);
 			}, function(err){
 				console.log(err);
 			});
@@ -331,6 +337,7 @@ angular.module('coloriAppGradients', [])
 		scope: {
 			title: '=',
 			author: '=',
+			authoravatar: '=',
 			views: '=',
 			hearts: '=',
 			comments: '=',

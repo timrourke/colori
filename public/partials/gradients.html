@@ -19,7 +19,7 @@
   	</header>
   	<div class="gradients-grid__gradients col-group">
   		<div ng-repeat="gradientItem in gradientItems | orderBy:sortOrder">
-  			<gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.Comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink" posted="gradientItem.createdAt" title="gradientItem.title"></gradient-item>
+  			<gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.Comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink" posted="gradientItem.createdAt" title="gradientItem.title" authoravatar="gradientItem.User.UserProfile.avatar_url"></gradient-item>
   		</div>
   	</div>
   </div>

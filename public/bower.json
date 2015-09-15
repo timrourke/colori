@@ -24,6 +24,7 @@
     "angular-ui-router": "~0.2.15",
     "lodash": "~3.10.1",
     "modernizr": "~2.8.3",
+    "ng-file-upload": "~7.2.1",
     "ngstorage": "~0.3.9",
     "velocity": "~1.2.2"
   }

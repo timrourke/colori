@@ -39,33 +39,36 @@ angular.module('coloriAppUsers', [])
   $scope.init();
 
 }])
-.controller('UserController', ['$rootScope', '$scope', 'Users', 'Auth', '$stateParams', function($rootScope, $scope, Users, Auth, $stateParams) {
+.controller('UserController', ['$rootScope', '$scope', 'Users', 'Auth', 'gradientService', '$stateParams', '$timeout', 'Upload', 'urls', 
+  function($rootScope, $scope, Users, Auth, gradientService, $stateParams, $timeout, Upload, urls) {
 
   $scope.user = [];
 
-  $scope.updatedUser = {
-    username: $rootScope.user.username,
-    email: $rootScope.user.email,
-    password: '',
-    confirmpassword: '',
-    UserProfile: {
-      avatar_url: $rootScope.user.UserProfile.avatar_url,
-      bio: $rootScope.user.UserProfile.bio,
-      website: $rootScope.user.UserProfile.website,
-      twitter_handle: $rootScope.user.UserProfile.twitter_handle,
-      facebook_handle: $rootScope.user.UserProfile.facebook_handle,
-      github_handle: $rootScope.user.UserProfile.github_handle,
-      dribble_handle: $rootScope.user.UserProfile.dribble_handle,
-      codepen_handle: $rootScope.user.UserProfile.codepen_handle
-    }
-  };
+  if ($rootScope.currentUser.UserProfile) {
+    $scope.updatedUser = {
+      username: $rootScope.currentUser.username,
+      email: $rootScope.currentUser.email,
+      password: '',
+      confirmpassword: '',
+      UserProfile: {
+        avatar_url: $rootScope.currentUser.UserProfile.avatar_url,
+        bio: $rootScope.currentUser.UserProfile.bio,
+        website: $rootScope.currentUser.UserProfile.website,
+        twitter_handle: $rootScope.currentUser.UserProfile.twitter_handle,
+        facebook_handle: $rootScope.currentUser.UserProfile.facebook_handle,
+        github_handle: $rootScope.currentUser.UserProfile.github_handle,
+        dribble_handle: $rootScope.currentUser.UserProfile.dribble_handle,
+        codepen_handle: $rootScope.currentUser.UserProfile.codepen_handle
+      }
+    };
+  }
 
   $scope.showSocial = true;
   $scope.showForm = true;
   $scope.showUpdateUserProfile = false;
 
   $scope.toggleUpdateUserProfile = function(){
-    $scope.showUpdateUserProfile = !$scope.showUpdateUserProfile;    
+    $scope.showUpdateUserProfile = !$scope.showUpdateUserProfile;
   }
 
   $scope.init = function() {
@@ -73,9 +76,6 @@ angular.module('coloriAppUsers', [])
       $stateParams.username,
       function(res) {
         $scope.user = res.foundUser;
-        console.log(res.foundUser);
-        console.log(Auth.getUser());
-        console.log($scope.user);
         if ($scope.user.id == Auth.getUser().id) {
           return $scope.showForm = true;
         } else {
@@ -85,13 +85,20 @@ angular.module('coloriAppUsers', [])
         $rootScope.message = res.message;
       }
     );
+    gradientService.getGradientsByUsername(
+      $stateParams.username,
+      function(res){
+        $scope.gradientItems = res.gradientsFound;
+      }, function(err){
+        console.log(err);
+      });
   }
 
   $scope.init();
 
   $scope.updateUser = function(updatedUser){
     Users.updateUser($stateParams.username, updatedUser, function(res) {
-      $rootScope.user = res.updatedUser;
+      $rootScope.currentUser = res.updatedUser;
       $scope.updatedUser = res.updatedUser;
       $scope.updatedUser.password = '';
       $scope.updatedUser.confirmpassword = '';
@@ -100,6 +107,31 @@ angular.module('coloriAppUsers', [])
       }
     }, function(err) {
 
+    });
+  }
+
+  $scope.uploadAvatar = function(file){
+    file.upload = Upload.upload({
+      url: urls.BASE + '/users/' + $stateParams.username + '/avatar',
+      method: 'POST',
+      fields: {username: $scope.updatedUser.username},
+      file: file,
+      fileFormDataName: $scope.updatedUser.username
+    });
+
+    file.upload.then(function (response) {
+      $timeout(function () {
+        $rootScope.currentUser.UserProfile.avatar_url = response.data.url;
+        file.result = response.data;
+      });
+    }, function (response) {
+      if (response.status > 0)
+        $scope.errorMsg = response.status + ': ' + response.data;
+    });
+
+    file.upload.progress(function (evt) {
+      // Math.min is to fix IE which reports 200% sometimes
+      file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
     });
   }
 

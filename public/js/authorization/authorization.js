@@ -77,7 +77,7 @@ angular.module('coloriAppAuthorization', [])
     $scope.$watch(function(scope){
       return Auth.getUser()
     }, function(newValue, OldValue) {
-      $rootScope.user = newValue;
+      $rootScope.currentUser = newValue;
     });
 
     $scope.loginCredentials = {

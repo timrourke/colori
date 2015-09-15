@@ -13,7 +13,7 @@ var AWS               = require('aws-sdk');
 AWS.config.loadFromPath(path.join(__dirname, 'config', 'aws_config.js'));
 var s3bucket = new AWS.S3({ params: {Bucket: 'colori'} });
 
-var params = {Key: 'myKey', Body: 'Hello!'};
+//var params = {Key: 'myKey', Body: 'Hello!'};
 // s3bucket.upload(params, function(err, data) {
 //     if (err) {
 //       console.log("Error uploading data: ", err);
@@ -81,7 +81,7 @@ app.use('/partials', express.static(__dirname + '/public/partials'));
  */
 //app.use('/api', tokenUtils.middleware().unless({path: ['/api/auth/login', '/api/auth/signup', '/api/auth/logout', '/api/gradients', '/api/comments', '/api/userprofiles']}));
 app.use("/api/auth", require(path.join(__dirname, 'routes', 'users', 'authorization.js'))(Models));
-app.use("/api/users", require(path.join(__dirname, 'routes', 'users', 'users.js'))(Models));
+app.use("/api/users", require(path.join(__dirname, 'routes', 'users', 'users.js'))(Models, s3bucket));
 app.use("/api/gradients", require(path.join(__dirname, 'routes', 'gradients', 'gradients.js'))(Models));
 app.use("/api/comments", require(path.join(__dirname, 'routes', 'comments', 'comments.js'))(Models));
 app.use("/api/userprofiles", require(path.join(__dirname, 'routes', 'userProfiles', 'userProfiles.js'))(Models));

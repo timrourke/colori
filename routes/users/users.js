@@ -6,9 +6,10 @@ var debug = require('debug')('app:routes:users' + process.pid),
     path = require('path'),
     tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils')),
     async = require('async'),
-    Router = require("express").Router;
+    Router = require("express").Router,
+    multiparty = require('multiparty');;
 
-module.exports = function (Models) {
+module.exports = function (Models, s3bucket) {
 
   var User = Models.User;
   var UserProfile = Models.UserProfile;
@@ -41,8 +42,6 @@ module.exports = function (Models) {
       where: { username: username }, 
       include: { model: UserProfile }, 
       attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'] }).then(function(user) {
-
-        console.log(user.username);
 
       if (!user) {
         return callback(null, null);        
@@ -192,6 +191,88 @@ module.exports = function (Models) {
       
     });
   });
+
+  router.route('/:username/avatar').post(tokenUtils.middleware(), function(req, res, next) {
+    var form = new multiparty.Form({
+      maxFields: 2
+    });
+
+    var destPath;
+
+    //Set the destPath to be the uploading user's username.
+    form.on('field', function(name, value){
+      if (name === 'username') {
+        destPath = 'avatar_' + value;
+      }
+    });
+
+    //upload files to s3
+    form.on('part', function(part){
+
+      var fileExtension = part.filename.split('.');
+
+      fileExtension = fileExtension[fileExtension.length - 1];
+
+      if (fileExtension !== 'jpg' && fileExtension !== 'png') {
+        console.log(fileExtension);
+        console.log('filename error');
+        return next(new Error('Incorrect file extension. Avatar images must be in .png or .jpg format with those exact extensions.'));
+      }
+
+      s3bucket.upload({
+        Key: destPath + '.' + fileExtension,
+        ACL: 'public-read',
+        Body: part,
+        ContentLength: part.byteCount
+      }, function(err, data){
+        if (err) {
+          console.log(err);
+          return next(err)
+        }
+      
+        findUserByUsername(req.params.username, function(err, user){
+          
+          console.log(user);
+
+          isUserInReqBodySelfOrAdmin(user, req, res, function(){
+
+            user.getUserProfile().then(function(userProfile){
+              userProfile.update({
+                avatar_url: 'https://s3.amazonaws.com/colori/' + destPath + '.' + fileExtension
+              }).then(function(updatedUserProfile){
+                res.status(200).json({
+                  success: true,
+                  message: 'Thanks! Profile pic was successfully uploaded.',
+                  url: 'https://s3.amazonaws.com/colori/' + destPath + '.' + fileExtension,
+                  updatedUserProfile: updatedUserProfile
+                });
+              }).catch(function(err){
+                console.log(err);
+                return next(err);  
+              });
+            }).catch(function(err){
+              console.log(err);
+              return next(err);
+            });
+
+          });
+        }); 
+
+      });
+    });
+
+    form.parse(req);
+
+  });
+
+//var params = {Key: 'myKey', Body: 'Hello!'};
+// s3bucket.upload(params, function(err, data) {
+//     if (err) {
+//       console.log("Error uploading data: ", err);
+//     } else {
+//       console.log("Successfully uploaded data to myBucket/myKey");
+//     }
+// });
 
   router.unless = require("express-unless");
 

@@ -1,8 +1,16 @@
 <article class="gradientItem">
 	<a ui-sref="gradient({ permalink: permalink })"><div class="gradient__gradient" style="{{gradient}}"><div class="gradient__overlay"></div><h6 class="gradient__title">{{title}}</h6><span class="gradient__date">{{posted | amTimeAgo}}</span></div></a>
 	<footer class="gradient__footer">
+		<span class="gradient__avatar">
+			<a ui-sref="user({ username: author })">
+				<svg ng-show="!authoravatar" class="site-user__avatar" viewBox="0 0 600 600">
+		      <use xlink:href="#anonymous_user" />
+		    </svg>	
+				<img class="site-user__avatar" ng-if="authoravatar != null" src="{{authoravatar}}" alt="{{user.username}}">
+			</a>
+		</span>
 		<span class="gradient__author">
-			{{author}}
+			<a ui-sref="user({ username: author })">{{author}}</a>
 		</span>
 		<div class="gradient__meta">
 			<span class="gradient__views">

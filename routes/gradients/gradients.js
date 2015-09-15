@@ -24,7 +24,8 @@ module.exports = function (Models) {
     Gradient.findAll({ 
       include: [
         { 
-          model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'] 
+          model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+            include: [{ model: UserProfile }]
         }, 
         { 
           model: Comment, 
@@ -55,7 +56,8 @@ module.exports = function (Models) {
       where: { permalink: req.params.permalink }, 
       include: [
         { 
-          model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'] }, 
+          model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+          include: [{ model: UserProfile }] }, 
           { 
             model: Comment, 
             include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
@@ -82,6 +84,41 @@ module.exports = function (Models) {
       return next(err);
     });
   });
+
+router.route('/by/:username').get(function(req, res, next) {
+  User.findOne({
+    where: { username: req.params.username }, 
+    include: [
+      { 
+        model: Gradient,
+        include: [{
+          model: User,
+            include: [{ model: UserProfile }]
+          },{ 
+          model: Comment, 
+            include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+              include: [{ model: UserProfile }] 
+            }] 
+        }]
+      }] 
+    }).then(function(user) {
+    
+    if (user.length == 0) {
+      res.status(404).json({ success: false, message: 'No gradients by ' + req.params.username + ' found.' });
+    } else {
+      console.log(user);
+      res.status(200).json({
+        success: true,
+        message: (user.Gradients.length > 1) ? user.Gradients.length + ' gradients found by ' + req.params.username + '.' : '1 gradient found by ' + req.params.username + '.',
+        gradientsFound: user.Gradients
+      }); 
+    }
+    
+  }).catch(function(err){
+    console.log(err);
+    return next(err);
+  });
+});
 
   router.route('/:permalink/comment').post(tokenUtils.middleware(), function(req, res, next) {
     Gradient.findOne({ where: { permalink: req.params.permalink }, 

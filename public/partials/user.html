@@ -5,11 +5,12 @@
         <svg ng-if="user.UserProfile.avatar_url == null" class="site-user__avatar" viewBox="0 0 600 600">
           <use xlink:href="#anonymous_user" />
         </svg>
+        <img class="site-user__avatar" ng-if="user.UserProfile.avatar_url != null" src="{{user.UserProfile.avatar_url}}" alt="{{user.username}}">
 
-        <button class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
-          <svg ng-if="user.UserProfile.avatar_url == null" viewBox="0 0 600 600">
-            <use xlink:href="#gear" />
-          </svg>  
+        <button ng-show="currentUser.username == user.username" class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
+          <svg viewBox="0 0 600 600">
+            <use xlink:href="#edit" />
+          </svg>
         </button>
         
       </div>
@@ -44,95 +45,132 @@
     </form>
   </aside>
   
-  <form ng-class="{'user__updateUser--open': showUpdateUserProfile, 'user__updateUser--close': !showUpdateUserProfile}" class="user__updateUser" ng-submit="updateUser(updatedUser)">
 
-    <button class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
-      <span class="icon">×</span> 
-    </button>
+  <div ng-class="{'user__updateUser--open': showUpdateUserProfile, 'user__updateUser--close': !showUpdateUserProfile}" class="user__updateUser">
+    <form ng-show="currentUser.username == user.username" ng-class="{'user__updateUser--open': showUpdateUserProfile, 'user__updateUser--close': !showUpdateUserProfile}" class="user__updateUserAvatar" name="user__updateUserAvatar">
+      <label>
+        Avatar Image
+        <input type="file" 
+          ngf-select name="file" 
+          accept="image/*" 
+          ng-model="updateUser.UserProfile.avatar_url" 
+          ngf-max-size="2MB" 
+          ngf-resize="{width: 400, height: 400, quality: 1}"
+          ngf-capture="'camera'"
+          ngf-pattern="'.png,.jpg'"
+          required>
 
-    <div class="user__updateUser-wrapper">
-      <h3>Update User Info</h3> 
+        <em ng-show="user__updateUserAvatar.file.$error.maxSize">
+          File too large 
+          {{picFile.size / 1000000|number:1}}MB: max {{picFile.$errorParam}}
+        </em>
 
-      <div class="user__updateUser__accountDetails">
-        <h4>Account Details</h4>
-        <label>
-          Username
-          <input type="text" placeholder="Username" ng-model="updatedUser.username">
-        </label>
+        <em ng-show="user__updateUserAvatar.file.$error.pattern">
+          File must be PNG or JPG format, with the extension '.png' or '.jpg'
+        </em>
+
+        <img 
+          ng-show="user__updateUserAvatar.file.$valid" 
+          ngf-src="!picFile.$error && updateUser.UserProfile.avatar_url"
+          class="thumb">
+        <br>
+        <button ng-disabled="!user__updateUserAvatar.$valid" 
+                ng-click="uploadAvatar(updateUser.UserProfile.avatar_url)">Submit</button>
         
-        <label>
-          Email
-          <input type="email" placeholder="Email" ng-model="updatedUser.email">  
-        </label>
+        <span 
+          class="progress" 
+          ng-show="updateUser.UserProfile.avatar_url.progress >= 0">
+          
+          <div 
+            style="width:{{updateUser.UserProfile.avatar_url.progress}}%" 
+            ng-bind="updateUser.UserProfile.avatar_url.progress + '%'"></div>
+        </span>
+        <span ng-show="updateUser.UserProfile.avatar_url.result">Upload Successful</span>
+        <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
+      </label>
+    </form>
+
+    <form ng-show="currentUser.username == user.username" ng-submit="updateUser(updatedUser)">
+
+      <button class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
+        <span class="icon">×</span> 
+      </button>
+
+      <div class="user__updateUser-wrapper">
+        <h3>Update User Info</h3> 
+
+        <div class="user__updateUser__accountDetails">
+          <h4>Account Details</h4>
+          
+          <label>
+            Email
+            <input type="email" placeholder="Email" ng-model="updatedUser.email">  
+          </label>
+          
+          <label>
+            New Password
+            <input type="password" ng-model="updatedUser.password">
+          </label>
+          
+          <label ng-if="updatedUser.password.length">
+            Confirm New Password
+            <input type="password" ng-model="updatedUser.confirmpassword">  
+          </label>
+        </div>
         
-        <label>
-          New Password
-          <input type="password" ng-model="updatedUser.password">
-        </label>
-        
-        <label ng-if="updatedUser.password.length">
-          Confirm New Password
-          <input type="password" ng-model="updatedUser.confirmpassword">  
-        </label>
+        <div class="user__updateUser__userProfile">
+          <h4>User Profile</h4>
+
+          <label>
+            Your website
+            <input type="url" placeholder="Your website's URL" ng-model="updatedUser.UserProfile.website">
+          </label>
+
+          <label>
+            Bio
+            <textarea ng-model="updatedUser.UserProfile.bio"></textarea>
+          </label>
+        </div>
+
+        <div class="user__updateUser__userProfile2">
+          <h4>Social Links</h4>
+
+          <label>
+            Twitter Handle
+            <input type="text" placeholder="@YourTwitterHandle" ng-model="updatedUser.UserProfile.twitter_handle">
+          </label>
+
+          <label>
+            Your Facebook Profile
+            <input type="url" placeholder="URL to your Facebook profile" ng-model="updatedUser.UserProfile.facebook_handle">
+          </label>
+
+          <label>
+            Your GitHub Profile
+            <input type="url" placeholder="URL to your GitHub profile" ng-model="updatedUser.UserProfile.github_handle">
+          </label>
+
+          <label>
+            Your Dribble Profile
+            <input type="url" placeholder="URL to your Dribble profile" ng-model="updatedUser.UserProfile.dribble_handle">
+          </label>
+
+          <label>
+            Your CodePen Profile
+            <input type="url" placeholder="URL to your CodePen profile" ng-model="updatedUser.UserProfile.codepen_handle">
+          </label>
+        </div>
       </div>
-      
-      <div class="user__updateUser__userProfile">
-        <h4>User Profile</h4>
 
-        <label>
-          Avatar Image
-          <input type="file" accept="image/*" ng-model="updateUser.UserProfile.avatar_url">
-        </label>
-
-        <label>
-          Your website
-          <input type="url" placeholder="Your website's URL" ng-model="updatedUser.UserProfile.website">
-        </label>
-
-        <label>
-          Bio
-          <textarea ng-model="updatedUser.UserProfile.bio"></textarea>
-        </label>
-      </div>
-
-      <div class="user__updateUser__userProfile2">
-        <h4>Social Links</h4>
-
-        <label>
-          Twitter Handle
-          <input type="text" placeholder="@YourTwitterHandle" ng-model="updatedUser.UserProfile.twitter_handle">
-        </label>
-
-        <label>
-          Your Facebook Profile
-          <input type="url" placeholder="URL to your Facebook profile" ng-model="updatedUser.UserProfile.facebook_handle">
-        </label>
-
-        <label>
-          Your GitHub Profile
-          <input type="url" placeholder="URL to your GitHub profile" ng-model="updatedUser.UserProfile.github_handle">
-        </label>
-
-        <label>
-          Your Dribble Profile
-          <input type="url" placeholder="URL to your Dribble profile" ng-model="updatedUser.UserProfile.dribble_handle">
-        </label>
-
-        <label>
-          Your CodePen Profile
-          <input type="url" placeholder="URL to your CodePen profile" ng-model="updatedUser.UserProfile.codepen_handle">
-        </label>
-      </div>
-    </div>
-
-    <input type="submit" value="Update">
-  </form>
+      <input type="submit" value="Update">
+    </form>
+  </div>
 
   <section class="gradients">
     <div class="gradients-grid col-group">
       <header class="gradients-grid__header">
         <nav class="gradients-grid__nav">
-          <span class="gradients-grid__nav-title">Showing all gradients.</span>
+          <span class="gradients-grid__nav-title">Showing gradients by {{user.username}}.</span>
           <form class="gradients-grid__nav-sort">
             <label>
               Sort by:
@@ -150,7 +188,9 @@
       
       <div class="gradients-grid__gradients col-group">
         <div ng-repeat="gradientItem in gradientItems | orderBy:sortOrder">
-          <gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.Comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink" posted="gradientItem.createdAt" title="gradientItem.title"></gradient-item>
+          
+          <gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.Comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink" posted="gradientItem.createdAt" title="gradientItem.title" authoravatar="gradientItem.User.UserProfile.avatar_url"></gradient-item>
+          
         </div>
       </div>  
     </div>
