@@ -39,14 +39,16 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
     }
 
   }])
-	.factory('tokenExpirationFactory', ['Auth', 'jwtHelper', '$location', 'TokenExpiredMessage', function(Auth, jwtHelper, $location, TokenExpiredMessage){
+	.factory('tokenExpirationFactory', ['$rootScope', 'Auth', 'jwtHelper', '$location', 'ToastFactory', function($rootScope, Auth, jwtHelper, $location, ToastFactory){
 		return {
 			check: function() {
 				var token = Auth.getToken();
 				if (token != undefined && jwtHelper.isTokenExpired(token)) {
-					TokenExpiredMessage('Your current user session has expired. Please log back in to proceed.').then(function(){
-						$location.path('/');
-					});
+					$rootScope.currentUser = null;
+					Auth.deleteToken();
+					ToastFactory('Your current user session has expired. Please log back in to proceed.', 4500, 'warn').then(function(){
+	    			console.warn('Your current user session has expired. Please log back in to proceed.');
+	    		});
 				}
 			}
 		}
@@ -106,10 +108,12 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
 	  $locationProvider.html5Mode(true);
 
 	}])
-.run(['$rootScope', 'colorStopRegister', 'tokenExpirationFactory', function($rootScope, colorStopRegister, tokenExpirationFactory){
+.run(['$rootScope', 'colorStopRegister', 'tokenExpirationFactory', 
+	function($rootScope, colorStopRegister, tokenExpirationFactory){
 	$rootScope.$on('$stateChangeStart',
     function(event, toState, toParams, fromState, fromParams){
     		tokenExpirationFactory.check();
+    		
 
         if (toState.url == '/gradients/:permalink' || toState.url == '/editor') {
         	colorStopRegister.setColorStops([]);

@@ -1,7 +1,7 @@
 .colorpicker__wrapper {
 	position:absolute;
 	bottom:8em;
-	width:u(1rem);
+	width:30px;
 }
 
 button.colorpicker__button {
@@ -11,8 +11,8 @@ button.colorpicker__button {
 	border-radius:50%;
 	//border:3px solid white;
 	filter:invert(100%) grayscale(100%);
-	width:u(2rem);
-	height:u(2rem);
+	width:30px;
+	height:30px;
 	padding:0;
 	box-shadow:0 0 3px 3px rgba(0,0,0,0.0625);
 	overflow:visible;

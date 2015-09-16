@@ -91,6 +91,7 @@ module.exports.retrieve = function (id, done) {
     debug("Calling retrieve for token: %s", id);
 
     if (_.isNull(id)) {
+        console.log('no id.');
         return done(new Error("token_invalid"), {
             "message": "Your user session is invalid or has expired. Please try to log in again."
         });
@@ -98,12 +99,14 @@ module.exports.retrieve = function (id, done) {
 
     client.get(id, function (err, reply) {
         if (err) {
+            console.log(err);
             return done(err, {
                 "message": err
             });
         }
 
         if (_.isNull(reply)) {
+            console.log('reply is null');
             return done(new Error("token_invalid"), {
                 "message": "Your user session is invalid or has expired. Please try to log in again."
             });
@@ -111,6 +114,7 @@ module.exports.retrieve = function (id, done) {
             var data = JSON.parse(reply);
 
             debug("User data fetched from redis store for user: %s", data.username);
+            console.log("User data fetched from redis store for user: %s", data.username);
 
             if (_.isEqual(data.token, id)) {
                 return done(null, data);
@@ -136,6 +140,7 @@ module.exports.verify = function (req, res, next) {
 
         if (err) {
             req.user = undefined;
+            console.log(err);
             return next(new UnauthorizedAccessError("invalid_token"));
         }
 
@@ -143,6 +148,7 @@ module.exports.verify = function (req, res, next) {
 
             if (err) {
                 req.user = undefined;
+                console.log(err);
                 return next(new UnauthorizedAccessError("invalid_token", data));
             }
 

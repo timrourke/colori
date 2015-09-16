@@ -127,7 +127,8 @@ angular.module('coloriAppGradients', [])
     }
 
   }])
-	.controller('gradientController', ['$timeout', '$scope', '$compile', 'colorStopRegister', 'gradientService', '$stateParams', 'GradientSaveFailed', function($timeout, $scope, $compile, colorStopRegister, gradientService, $stateParams, GradientSaveFailed) {
+	.controller('gradientController', ['$scope', '$compile', '$location', 'colorStopRegister', 'gradientService', '$stateParams', 'GradientSaveFailed', 'ToastFactory', 
+		function($scope, $compile, $location, colorStopRegister, gradientService, $stateParams, GradientSaveFailed, ToastFactory) {
 
 		$scope.gradient = {};
 
@@ -179,7 +180,6 @@ angular.module('coloriAppGradients', [])
 				$stateParams.permalink,
 				newComment,
 				function(res){
-					console.log(res);
 					$scope.newComment = {
 					 	body: ''
 					 };
@@ -269,6 +269,10 @@ angular.module('coloriAppGradients', [])
 			gradientService.createGradient(newGradient,
 				function(res){
 					console.log(res);
+					$location.path('/gradients/' + res.gradientCreated.permalink);
+					ToastFactory('Gradient successfully saved.', 3000, 'success').then(function(){
+            console.info('Gradient successfully saved.');
+          }); 
 				}, function(err){
 					GradientSaveFailed(err.message).then(function(){
 						console.log(err);
@@ -296,7 +300,9 @@ angular.module('coloriAppGradients', [])
 
 			for(var i = 0; i < colorPickers.length; i++){
 				var colorPicker = colorPickers[i];
-				var el = '<div style="position:absolute;left:' + colorPicker.left + '%" class="colorpicker__wrapper" draggable gradient-id="' + colorPicker.id + '"><button class="colorpicker__button" style="border:3px solid {{colorStops.colorStop' + colorPicker.id + '.color}};" colorpicker="rgba" colorpicker-position="custom" colorpicker-with-input="true" ng-model="colorStops.colorStop' + colorPicker.id + '.color"><div class="colorpicker__button-position-arrow" style="border-top:10px solid {{colorStops.colorStop' + colorPicker.id + '.color}};"></div></button></div>';
+				//Offset the left position of each rehydrated colorpicker to account for its width.
+				var offsetAmount = (15/window.innerWidth) * 100;
+				var el = '<div style="position:absolute;left:' + (colorPicker.left-offsetAmount) + '%" class="colorpicker__wrapper" draggable gradient-id="' + colorPicker.id + '"><button class="colorpicker__button" style="border:3px solid {{colorStops.colorStop' + colorPicker.id + '.color}};" colorpicker="rgba" colorpicker-position="custom" colorpicker-with-input="true" ng-model="colorStops.colorStop' + colorPicker.id + '.color"><div class="colorpicker__button-position-arrow" style="border-top:10px solid {{colorStops.colorStop' + colorPicker.id + '.color}};"></div></button></div>';
 				colorPickersElement +=  el;
 				colorStopRegister.pushExistingColorStop(colorPicker, colorPickers.length);	
 			}

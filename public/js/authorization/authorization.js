@@ -1,6 +1,6 @@
 angular.module('coloriAppAuthorization', [])
-.factory('Auth', ['$rootScope', '$http', '$localStorage', 'urls', '$location', 
-	function($rootScope, $http, $localStorage, urls, $location) {
+.factory('Auth', ['$rootScope', '$http', '$localStorage', 'urls', '$location', 'ToastFactory', 
+	function($rootScope, $http, $localStorage, urls, $location, ToastFactory) {
   
 	  return {
 	    signup: function (data, success, error) {
@@ -27,16 +27,28 @@ angular.module('coloriAppAuthorization', [])
 	        .then(function(res) {
 	          delete $localStorage.id_token;
 	          delete $localStorage.user;
-	          $location.path('/'); 
+	          $location.path('/');
+            ToastFactory('Successfully logged out.', 3000, '').then(function(){
+              console.info('Successfully logged out.');
+            }); 
 	        }, function(res){
 	          delete $localStorage.id_token;
 	          delete $localStorage.user;
 	          $location.path('/');
+            ToastFactory('Successfully logged out.', 3000, '').then(function(){
+              console.info('Successfully logged out.');
+            }); 
 	        });
 	    },
-	    getToken: function () {
+	    getToken: function() {
 	      return $localStorage.id_token;  
 	    },
+      setToken: function(val) {
+        $localStorage.id_token = val;
+      },
+      deleteToken: function() {
+        delete $localStorage.id_token;
+      },
 	    setUser: function(user) {
 	      return $localStorage.user = user;
 	    },
@@ -51,6 +63,9 @@ angular.module('coloriAppAuthorization', [])
 	      $localStorage.id_token = res.user.token;
 	      $localStorage.user = res.user;
 	      $location.path('/');
+        ToastFactory('Welcome back, ' + res.user.username + '!', 3000, 'success').then(function(){
+          console.info('Welcome back, ' + res.user.username + '!');
+        });
 	    }
 	  };
 
@@ -88,6 +103,17 @@ angular.module('coloriAppAuthorization', [])
     }
 
   }])
+  .factory('ToastFactory', ['$mdToast', function($mdToast){
+
+    return function(message, delay, cssClass){
+      var toastConfig = {
+        hideDelay: delay || 3000,
+        template: '<md-toast class="' + cssClass + '"><span flex>' + message + '</span></md-toast>'
+      }
+      return $mdToast.show(toastConfig);
+    }
+
+  }])
 	.controller('LoginController', ['$rootScope', '$scope', '$location', '$localStorage', 'Auth', 'LoginFailed', 
   function LoginController($rootScope, $scope, $location, $localStorage, Auth, LoginFailed) {
 
@@ -116,12 +142,13 @@ angular.module('coloriAppAuthorization', [])
         }
       }, function (err) {
         LoginFailed(err.message).then(function(){
-          console.log('success');
+          console.error(err.message);
         });
       });
     };
 
-    $scope.logout = function () {
+    $scope.logout = function (e) {
+      e.preventDefault();
       Auth.logout();
     };
 
@@ -153,7 +180,7 @@ angular.module('coloriAppAuthorization', [])
     function (err) {
     	var errorMessage = '';
     	if (typeof err.message != 'string') {
-    		errorMessage += '<p>Sorry, something while creating your account:</p><ul>';
+    		errorMessage += '<p>Sorry, something went wrong while creating your account:</p><ul>';
     		for (index in err.message) {
 	    		errorMessage += '<li>' + err.message[index].message + '</li>';
 	    	}	
