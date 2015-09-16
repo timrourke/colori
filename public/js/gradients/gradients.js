@@ -54,28 +54,29 @@ angular.module('coloriAppGradients', [])
 			getPickerCount: function() {
 				return pickerCount;
 			},
+			setPickerCount: function(num) {
+				pickerCount = num;
+			},
 			pushColorStop: function(el) {
 				var newColorStop = {
 					id: pickerCount,
 					left: ((el.prop('offsetLeft') + (el.prop('clientWidth')/2)) / window.innerWidth * 100).toPrecision(5),
 	        color: ( Object.size(colorStops) > 1 ) ? colorStops.colorStop0.color : 'white'
 				};
-				
+
 				colorStops['colorStop' + pickerCount] = newColorStop;
 				
-				console.log(colorStops);
 				pickerCount++;
 			},
-			pushExistingColorStop: function(colorStop) {
+			pushExistingColorStop: function(colorStop, colorStopsNum) {
 				var newColorStop = {
-					id: pickerCount,
+					id: colorStop.id,
 					left: colorStop.left,
 	        color: colorStop.color
 				};
 				
-				colorStops['colorStop' + pickerCount] = newColorStop;
+				colorStops['colorStop' + newColorStop.id] = newColorStop;
 				
-				console.log(colorStops);
 				pickerCount++;
 			},
 			setGradientLeft: function(colorStopId, leftAmount) {
@@ -95,7 +96,6 @@ angular.module('coloriAppGradients', [])
 				for (var key in colorStops) {
 					result.push(colorStops[key])
 				}
-				console.log(result);
 				return result;
 			}
 		};
@@ -138,6 +138,7 @@ angular.module('coloriAppGradients', [])
 					function(res){
 						$scope.gradient = res.gradientFound;
 						addExistingColorPickers(res.gradientFound.color_stops);
+						$scope.colorStops = colorStopRegister.getColorStops();
 					}, function(err){
 						console.log(err);
 					});
@@ -248,7 +249,6 @@ angular.module('coloriAppGradients', [])
 
 		$scope.getGradientCssString = getGradientCssString;
 		$scope.gradientCssString = getGradientCssString();
-		$scope.colorStops = colorStopRegister.getRawColorStops();
 
 		//Keep an eye on our gradient service to see if our view
 		//should be updated with new color stops.
@@ -288,18 +288,23 @@ angular.module('coloriAppGradients', [])
 		};
 
 		addExistingColorPickers = function(colorPickers) {
+			if (colorStopRegister.getPickerCount() == colorPickers.length) {
+				return;
+			}
 			var elDest = document.querySelector('.gradient-wrapper');
 			var colorPickersElement = ''; 
 
 			for(var i = 0; i < colorPickers.length; i++){
 				var colorPicker = colorPickers[i];
-				var gradCount = colorStopRegister.getPickerCount();
-				var el = '<div style="position:absolute;left:' + colorPicker.left + '%" class="colorpicker__wrapper" draggable gradient-id="' + colorPicker.id + '"><button class="colorpicker__button" style="border:3px solid colorStops.colorStop.' + colorPicker.id + '.color}};" colorpicker="rgba" colorpicker-position="custom" colorpicker-with-input="true" ng-model="colorStops.colorStop' + colorPicker.id + '.color"><div class="colorpicker__button-position-arrow" style="border-top:10px solid {{colorStops.colorStop' + colorPicker.id + '.color}};"></div></button></div>';
+				var el = '<div style="position:absolute;left:' + colorPicker.left + '%" class="colorpicker__wrapper" draggable gradient-id="' + colorPicker.id + '"><button class="colorpicker__button" style="border:3px solid {{colorStops.colorStop' + colorPicker.id + '.color}};" colorpicker="rgba" colorpicker-position="custom" colorpicker-with-input="true" ng-model="colorStops.colorStop' + colorPicker.id + '.color"><div class="colorpicker__button-position-arrow" style="border-top:10px solid {{colorStops.colorStop' + colorPicker.id + '.color}};"></div></button></div>';
 				colorPickersElement +=  el;
-				colorStopRegister.pushExistingColorStop(colorPicker);
+				colorStopRegister.pushExistingColorStop(colorPicker, colorPickers.length);	
 			}
+
 			if (colorStopRegister.getPickerCount() == colorPickers.length) {
-				angular.element(elDest).append($compile(colorPickersElement)($scope));	
+				$scope.colorStops = colorStopRegister.getRawColorStops();
+				angular.element(elDest).append($compile(colorPickersElement)($scope));
+				colorStopRegister.setPickerCount(colorPickers.length);
 			}
 		};
 
@@ -320,6 +325,7 @@ angular.module('coloriAppGradients', [])
 
 		$scope.sortOrder = '';
 
+		
 		$scope.init();
 
 	}])
