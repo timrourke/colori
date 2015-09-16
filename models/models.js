@@ -54,7 +54,14 @@ module.exports = function(sequelize, Sequelize) {
 	      var hash = bcrypt.hashSync(v, salt);
 	      this.setDataValue('password', hash);
 	    }},
-		email: 										{ type: Sequelize.STRING, unique: true, allowNull: false, validate: { isEmail: true } },
+		email: 										{ type: Sequelize.STRING, unique: true, allowNull: false, validate: 
+			{ 
+				isEmail: {
+					args: true,
+					msg: 'Whoops, this email does not appear to be valid. Please check it for errors and try again.'
+				}
+			} 
+		},
 		email_verified: 					{ type: Sequelize.BOOLEAN, defaultValue: false },
 		email_verification_uuid: 	{ type: Sequelize.STRING, unique: true, defaultValue: Sequelize.UUIDV4 },
 		password_reset_uuid: 			{ type: Sequelize.STRING, unique: true, defaultValue: null },

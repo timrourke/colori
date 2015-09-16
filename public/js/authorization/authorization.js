@@ -1,12 +1,13 @@
 angular.module('coloriAppAuthorization', [])
-.factory('Auth', ['$rootScope', '$http', '$localStorage', 'urls', '$location', function($rootScope, $http, $localStorage, urls, $location) {
+.factory('Auth', ['$rootScope', '$http', '$localStorage', 'urls', '$location', 
+	function($rootScope, $http, $localStorage, urls, $location) {
   
 	  return {
 	    signup: function (data, success, error) {
 	      $http.post(urls.BASE + '/auth/signup', data).then(function(res){
-	        success
-	      }, function(res) {
-	        error
+	        success(res.data);
+	      }, function(err) {
+	        error(err.data);
 	      });
 	    },
 	    login: function (data, success, error) {
@@ -26,15 +27,12 @@ angular.module('coloriAppAuthorization', [])
 	        .then(function(res) {
 	          delete $localStorage.id_token;
 	          delete $localStorage.user;
-	          $rootScope.message = res.data.message;
 	          $location.path('/'); 
 	        }, function(res){
 	          delete $localStorage.id_token;
 	          delete $localStorage.user;
-	          //$rootScope.message = res.message;
 	          $location.path('/');
 	        });
-	      
 	    },
 	    getToken: function () {
 	      return $localStorage.id_token;  
@@ -52,22 +50,41 @@ angular.module('coloriAppAuthorization', [])
 	    successAuth: function(res) {
 	      $localStorage.id_token = res.user.token;
 	      $localStorage.user = res.user;
-	      $rootScope.message = res.user.message;
 	      $location.path('/');
 	    }
 	  };
 
 	}])
+	.factory('SignupSuccess', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+      var alert = $mdDialog.alert()
+        .title('Check your email!')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+    }
+
+  }])
+  .factory('SignupFailure', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+      var alert = $mdDialog.alert()
+        .title('Sorry, we couldn\'t create your account.')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+    }
+
+  }])
   .factory('LoginFailed', ['$mdDialog', function($mdDialog){
 
     return function(message) {
-
       var alert = $mdDialog.alert()
         .title('Couldn\'t log in!')
         .content(message)
         .ok('Close');
         return $mdDialog.show(alert);
-
     }
 
   }])
@@ -110,17 +127,43 @@ angular.module('coloriAppAuthorization', [])
 
   }
 ])
-.controller('SignupController', ['$rootScope', '$scope', 'Auth', function($rootScope, $scope, Auth) {
+.controller('SignupController', ['$rootScope', '$scope', '$location', 'Auth', 'SignupSuccess', 'SignupFailure', function($rootScope, $scope, $location, Auth, SignupSuccess, SignupFailure) {
 
-  $scope.signup = function () {
-    var formData = {
-      username: $scope.username,
-      email: $scope.email,
-      password: $scope.password
-    };
+	$scope.newUser = {
+    username: '',
+    email: '',
+    password: '',
+    confirmpassword: ''
+  };
 
-    Auth.signup(formData, Auth.successAuth, function (res) {
-      $rootScope.message = res.message || 'Failed to sign up.';
+  $scope.signup = function (newUser) {
+
+    Auth.signup(newUser, 
+    function(res){
+    	SignupSuccess(res.message).then(function(){
+    		$scope.newUser = {
+		      username: '',
+		      email: '',
+		      password: '',
+		      confirmpassword: ''
+		    };
+    		$location.path('/login');
+    	});
+    }, 
+    function (err) {
+    	var errorMessage = '';
+    	if (typeof err.message != 'string') {
+    		errorMessage += '<p>Sorry, something while creating your account:</p><ul>';
+    		for (index in err.message) {
+	    		errorMessage += '<li>' + err.message[index].message + '</li>';
+	    	}	
+	    	errorMessage += '</ul>';
+    	} else {
+    		errorMessage = err.message;
+    	}
+      SignupFailure(errorMessage).then(function(){
+    		$location.path('/signup');
+    	});
     });
   };
 }])

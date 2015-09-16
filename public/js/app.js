@@ -26,11 +26,36 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
 	.constant('urls', {
 	  BASE: 'http://localhost:8080/api'
 	})
-	.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', '$httpProvider', 'jwtInterceptorProvider', 
-		function($stateProvider, $urlRouterProvider, $locationProvider, $httpProvider, jwtInterceptorProvider) {
+	.factory('TokenExpiredMessage', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+
+      var alert = $mdDialog.alert()
+        .title('Your session has expired.')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+
+    }
+
+  }])
+	.factory('tokenExpirationFactory', ['Auth', 'jwtHelper', '$location', 'TokenExpiredMessage', function(Auth, jwtHelper, $location, TokenExpiredMessage){
+		return {
+			check: function() {
+				var token = Auth.getToken();
+				if (token != undefined && jwtHelper.isTokenExpired(token)) {
+					TokenExpiredMessage('Your current user session has expired. Please log back in to proceed.').then(function(){
+						$location.path('/');
+					});
+				}
+			}
+		}
+	}])
+	.config(['$provide', '$stateProvider', '$urlRouterProvider', '$locationProvider', '$httpProvider', 'jwtInterceptorProvider', 
+		function($provide, $stateProvider, $urlRouterProvider, $locationProvider, $httpProvider, jwtInterceptorProvider) {
 
 		jwtInterceptorProvider.tokenGetter = ['$localStorage', 'Auth', function($localStorage, Auth) {
-	    return Auth.getToken();
+			return Auth.getToken();
 	  }];
 
 	  $httpProvider.interceptors.push('jwtInterceptor');
@@ -81,9 +106,11 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
 	  $locationProvider.html5Mode(true);
 
 	}])
-.run(['$rootScope', 'colorStopRegister', function($rootScope, colorStopRegister){
+.run(['$rootScope', 'colorStopRegister', 'tokenExpirationFactory', function($rootScope, colorStopRegister, tokenExpirationFactory){
 	$rootScope.$on('$stateChangeStart',
     function(event, toState, toParams, fromState, fromParams){
+    		tokenExpirationFactory.check();
+
         if (toState.url == '/gradients/:permalink' || toState.url == '/editor') {
         	colorStopRegister.setColorStops([]);
         }

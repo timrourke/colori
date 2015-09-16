@@ -1,5 +1,5 @@
 <section class="signup">
-	<form ng-submit="signup()">
+	<form ng-submit="signup(newUser)">
 		<div class="row">
 			<svg class="login__avatar" viewBox="0 0 600 600">
         <use xlink:href="#anonymous_user" />
@@ -9,17 +9,22 @@
 		
 		<label for="username">
 			Username
-			<input type="text" id="username" ng-model="username" placeholder="Username">	
+			<input type="text" id="username" ng-model="newUser.username" placeholder="Username" required>	
 		</label>
 		
 		<label for="email">
 			Email
-			<input type="email" id="email" ng-model="email" placeholder="Email">
+			<input type="email" id="email" ng-model="newUser.email" placeholder="Email" required>
 		</label>
 		
 		<label for="password">
 			Password
-			<input type="password" id="password" ng-model="password">	
+			<input type="password" id="password" ng-model="newUser.password" minlength="8" required>	
+		</label>
+
+		<label ng-show="!newUser.password.$error && newUser.password.length > 0" for="confirmpassword">
+			Confirm Password
+			<input type="password" id="confirmpassword" ng-model="newUser.confirmpassword" minlength="8" required>	
 		</label>
 		
 		<input type="submit" value="Sign Up">

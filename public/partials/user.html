@@ -29,16 +29,17 @@
         </li>
       </ul>
     </div>
-    <form ng-show="user" class="user-comment-form" ng-submit="postComment(newComment)">
+    <form ng-show="currentUser" class="user-comment-form" ng-submit="postComment(newComment)">
       <textarea ng-model="newComment.body"></textarea>
       <div class="user-comment__input clearfix">
         <div class="user-comment__current-user">
           <div class="user-comment__card__avatar">
-            <svg ng-if="user.UserProfile.avatar_url == null" class="icon site-user__avatar" viewBox="0 0 600 600">
+            <svg ng-show="currentUser.UserProfile.avatar_url == null" class="icon site-user__avatar" viewBox="0 0 600 600">
               <use xlink:href="#anonymous_user" />
             </svg>
+            <img ng-if="currentUser.UserProfile.avatar_url" class="icon site-user__avatar" src="{{currentUser.UserProfile.avatar_url}}" alt="{{currentUser.username}}" />
           </div>
-          <em>Logged in as {{user.username}}. <a href="#0" ng-click="logout()">Log out?</a></em>
+          <em>Logged in as {{currentUser.username}}. <a ng-href="" ng-click="logout()">Log out?</a></em>
         </div>
         <input type="submit">  
       </div>

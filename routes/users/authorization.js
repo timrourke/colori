@@ -86,15 +86,15 @@ module.exports = function (Models) {
     }
     
     if (_.isEmpty(newUser.username)) {
-      return res.status(400).json({ success: false, message: 'Signup failed. Username must not be blank.' });
+      return res.status(400).json({ success: false, message: 'Signup failed. Please be sure to provide a username and try again.' });
     }
 
     if (_.isEmpty(newUser.password)) {
-      return res.status(400).json({ success: false, message: 'Signup failed. Password must not be blank.' });
+      return res.status(400).json({ success: false, message: 'Signup failed. Please make sure you provide a password.' });
     }
 
     if (_.isEmpty(newUser.password)) {
-      return res.status(400).json({ success: false, message: 'Signup failed. Email address must not be blank.' });
+      return res.status(400).json({ success: false, message: 'Signup failed. Please include a valid email address so we can verify your account.' });
     }
 
     process.nextTick(function() {
@@ -104,7 +104,7 @@ module.exports = function (Models) {
       }).then(function(user) {
 
         if (user) {
-            res.status(400).json({ success:false, message: 'Signup failed. Username taken. Please try another username.' });
+            res.status(400).json({ success:false, message: 'Sorry, signup failed. The username you selected has been taken. Please try another username.' });
         } else if (!user || user.length == 0) {
 
           User.create(newUser).then(function(user) {
@@ -165,6 +165,8 @@ module.exports = function (Models) {
 
   router.route("/signup").post(signup, function (err, user, req, res, next) {
     if (err) throw err;
+
+    console.log('completed signup');
 
     return res.status(200).json({
       user: user.username,

@@ -115,6 +115,10 @@ app.use(function (err, req, res, next) {
             code = err.status;
             msg = err.inner;
             break;
+        case "SequelizeUniqueConstraintError":
+            code = 409;
+            msg = { message: err.errors };
+            break;    
         case "SequelizeValidationError":
             msg = err;
             break;

@@ -54,7 +54,7 @@ md-dialog {
   background-color:$lightgrey;
   opacity: 0;
   min-width: 240px;
-  max-width: 80%;
+  max-width: 20em;
   max-height: 80%;
   position: relative;
   overflow: auto;
@@ -136,5 +136,5 @@ md-dialog {
     border: 1px solid #fff; } }
 
 md-dialog .md-title {
-  @extend .typl8-beta;
+  @extend .typl8-delta;
 }
