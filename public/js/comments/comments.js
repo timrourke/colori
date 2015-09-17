@@ -11,7 +11,7 @@ angular.module('coloriAppComments', [])
 		},
 		link: {
 			pre: function(scope, element, attributes) {
-
+				angular.element(element).css({'opacity':0});
 				animator.scrollTo(element, element.parent().parent().parent());
 			}
 		}

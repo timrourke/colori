@@ -172,9 +172,7 @@ angular.module('coloriAppGradients', [])
 		function($scope, $compile, $location, colorStopRegister, gradientService, $stateParams, GradientSaveFailed, ToastFactory) {
 
 		function flattenCommentsObject(commentsInput) {
-			console.log();
 			//Reprocess into flat array for sorting.
-
 			if (Array.isArray(commentsInput)) {
 				for(var i = 0; i < commentsInput.length; i++) {
 					var commentTemp = {
@@ -184,6 +182,7 @@ angular.module('coloriAppGradients', [])
 						authoravatar: commentsInput[i].User.UserProfile.avatar_url
 					}
 					$scope.comments.push(commentTemp);
+					upsert($scope.gradient.Comments, {id: commentsInput[i].id}, commentsInput[i]);
 				}
 			} else {
 				var commentTemp = {
@@ -193,6 +192,7 @@ angular.module('coloriAppGradients', [])
 					authoravatar: commentsInput.User.UserProfile.avatar_url
 				}
 				$scope.comments.push(commentTemp);
+				upsert($scope.gradient.Comments, {id: commentsInput.id}, commentsInput);
 			}
 			
 		}
