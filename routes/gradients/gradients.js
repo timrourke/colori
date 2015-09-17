@@ -93,18 +93,31 @@ module.exports = function (Models) {
 
   router.route('/:permalink/heart').post(tokenUtils.middleware(), function(req, res, next){
     Gradient.findOne({
-      where: { permalink: req.params.permalink }
+      where: { permalink: req.params.permalink },
+        include: [
+          { 
+            model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+            include: [{ model: UserProfile }] 
+          }, 
+          { 
+            model: Comment, 
+            include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+              include: [{ model: UserProfile }]
+            }] 
+          },{
+            model: Heart
+          }]
     }).then(function(gradient){
 
       if (!gradient) {
         return res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
       } else {
 
-        gradient.getHearts({ where: { UserId: req.user.id, GradientId: gradient.id } }).then(function(hearts){
+        gradient.getHearts({ 
+          where: { UserId: req.user.id, GradientId: gradient.id }
+        }).then(function(hearts){
 
           if (!hearts || hearts.length == 0) {
-
-            console.log('no hearts');
 
             User.findOne({ where: { id: req.user.id } }).then(function(user){
 
@@ -126,15 +139,30 @@ module.exports = function (Models) {
                         gradientFound: finalGradient
                       });
 
-                    });
+                    }).catch(function(err){
+                      console.log(err);
+                      return next(err);
+                    });;
 
-                  });
+                  }).catch(function(err){
+                    console.log(err);
+                    return next(err);
+                  });;
 
-                });
+                }).catch(function(err){
+                  console.log(err);
+                  return next(err);
+                });;
 
-              });
+              }).catch(function(err){
+                console.log(err);
+                return next(err);
+              });;
 
-            });
+            }).catch(function(err){
+              console.log(err);
+              return next(err);
+            });;
 
           } else {
             return res.status(304);
@@ -193,8 +221,8 @@ router.route('/by/:username').get(function(req, res, next) {
         model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt']  
       }, { 
         model: Comment, 
-        include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
-          include: [{ model: UserProfile }] 
+          include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+            include: [{ model: UserProfile }] 
       }] 
     }] }).then(function(gradient) {
 
@@ -250,7 +278,7 @@ router.route('/by/:username').get(function(req, res, next) {
               return next(err);
             });
 
-          }
+          } // end if/else block checking for author
 
         }).catch(function(err){
           console.log(err);
@@ -341,7 +369,7 @@ router.route('/by/:username').get(function(req, res, next) {
               return next(err);
             });
 
-          }
+          } // end if/else block checking for author
 
         }).catch(function(err){
           console.log(err);

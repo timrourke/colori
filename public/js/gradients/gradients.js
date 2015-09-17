@@ -336,6 +336,15 @@ angular.module('coloriAppGradients', [])
 				$scope.gradientCssString = getGradientCssString();
 			});
 
+		$scope.addHeart = function(permalink){
+			gradientService.heartGradient(permalink,
+				function(res){
+					$scope.gradient = res.gradientFound;
+				}, function(err){
+					console.log(err);
+				});
+		};
+
 		$scope.saveGradient = function(){
 			var newGradient = {
 				title: 'New Gradient',
