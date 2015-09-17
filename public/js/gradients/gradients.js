@@ -5,6 +5,7 @@ angular.module('coloriAppGradients', [])
 			getGradients: function(success, error){
 				$http.get(urls.BASE + '/gradients').then(function(res){
 					success(res.data);
+					console.log(res.data);
 				}, function(err){
 					error(err.data);
 				});
@@ -12,6 +13,7 @@ angular.module('coloriAppGradients', [])
 			getGradientsByUsername: function(username, success, error){
 				$http.get(urls.BASE + '/gradients/by/' + username).then(function(res){
 					success(res.data);
+					console.log(res.data);
 				}, function(err){
 					error(err.data);
 				});
@@ -22,6 +24,7 @@ angular.module('coloriAppGradients', [])
 				} else {
 					$http.get(urls.BASE + '/gradients/' + permalink).then(function(res){
 						gradientCache[permalink] = res.data;
+						console.log(res.data);
 						success(res.data);
 					}, function(err) {
 						error(err.data);
@@ -30,6 +33,13 @@ angular.module('coloriAppGradients', [])
 			},
 			createGradient: function(gradient, success, error){
 				$http.post(urls.BASE + '/gradients', gradient).then(function(res){
+					success(res.data);
+				}, function(err){
+					error(err.data);
+				});
+			},
+			heartGradient: function(permalink, success, error){
+				$http.post(urls.BASE + '/gradients/' + permalink + '/heart').then(function(res){
 					success(res.data);
 				}, function(err){
 					error(err.data);
@@ -394,10 +404,9 @@ angular.module('coloriAppGradients', [])
 			}, function(err){
 				console.log(err);
 			});
-		}
+		};
 
 		$scope.sortOrder = '';
-
 		
 		$scope.init();
 
@@ -408,7 +417,7 @@ angular.module('coloriAppGradients', [])
 			template: '<button type="button" ng-click="addColorPicker()"><svg style="fill:{{sortedColorStops[0].color || \'white\'}};" class="icon" viewBox="0 0 600 600"><use xlink:href="#eyedropper_45_add" /></svg></button>'
 		};
 	}])
-.directive('gradientItem', ['animator', function(animator) {
+.directive('gradientItem', ['animator', 'gradientService', function(animator, gradientService) {
 	return {
 		restrict: 'E',
 		scope: {
@@ -420,13 +429,23 @@ angular.module('coloriAppGradients', [])
 			comments: '=',
 			gradient: '=',
 			permalink: '=',
-			posted: '='
+			posted: '=',
+			allgradients: '='
 		},
 		templateUrl: '/partials/directives/gradient-item.html',
 		link: function(scope, element, attributes) {
 			element[0].querySelector('.gradientItem').style.opacity = 0;
 			
 			animator.fadeInUp(element[0].querySelector('.gradientItem'), scope.$parent.$index);
+
+			scope.addHeart = function(permalink){
+				gradientService.heartGradient(permalink,
+					function(res){
+						upsert(scope.allgradients, {'id': res.gradientFound.id}, res.gradientFound);
+					}, function(err){
+						console.log(err);
+					});
+			};
 		}
 	}
 }])

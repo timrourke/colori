@@ -22,6 +22,16 @@ function bySortedLeftValue(obj, callback, context) {
     while (length--) callback.call(context, tuples[length][0], tuples[length][1]);
 }
 
+var upsert = function (arr, key, newval) {
+    var match = _.find(arr, key);
+    if(match){
+        var index = _.indexOf(arr, _.find(arr, key));
+        arr.splice(index, 1, newval);
+    } else {
+        arr.push(newval);
+    }
+};
+
 angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angularMoment', 'ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppUsers', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
 	.constant('urls', {
 	  BASE: 'http://localhost:8080/api'

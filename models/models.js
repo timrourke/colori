@@ -114,7 +114,6 @@ module.exports = function(sequelize, Sequelize) {
 			} 
 		},
 		color_stops: 							{ type: Sequelize.JSON, allowNull: false },
-		hearts: 									{ type: Sequelize.INTEGER, defaultValue: 0 },
 		views: 										{ type: Sequelize.INTEGER, defaultValue: 0 }
 	},{
 		hooks: {
@@ -139,8 +138,7 @@ module.exports = function(sequelize, Sequelize) {
 					msg: 'Sorry, your comment must be under 2000 characters long.'
 				}
 			}
-		},
-		hearts: 									{ type: Sequelize.INTEGER, default: 0 }
+		}
 	});
 
 	var Heart = sequelize.define('Heart', {
@@ -195,7 +193,8 @@ module.exports = function(sequelize, Sequelize) {
 		User: User,
 		UserProfile: UserProfile,
 		Gradient: Gradient,
-		Comment: Comment
+		Comment: Comment,
+		Heart: Heart
 	}
 
 	return Models;

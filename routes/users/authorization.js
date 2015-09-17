@@ -80,6 +80,7 @@ module.exports = function (Models) {
     var newUser = {
         username: req.body.username,
         password: req.body.password,
+        confirmpassword: req.body.confirmpassword,
         email: req.body.email,
         email_verification_uuid: uuid.v4(),
         is_admin: false
@@ -95,6 +96,10 @@ module.exports = function (Models) {
 
     if (_.isEmpty(newUser.password)) {
       return res.status(400).json({ success: false, message: 'Signup failed. Please include a valid email address so we can verify your account.' });
+    }
+
+    if (_.isEmpty(newUser.confirmpassword) || newUser.password !== newUser.confirmpassword) {
+      return res.status(400).json({ success: false, message: 'Signup failed. Please make sure your password matches the conrimation password.' });
     }
 
     process.nextTick(function() {

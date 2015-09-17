@@ -17,6 +17,7 @@ module.exports = function (Models) {
   var UserProfile = Models.UserProfile;
   var Gradient = Models.Gradient;
   var Comment = Models.Comment;
+  var Heart = Models.Heart;
 
   var router = new Router();
 
@@ -32,6 +33,8 @@ module.exports = function (Models) {
             include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
               include: [{ model: UserProfile }] 
             }] 
+        },{
+          model: Heart
         }] 
       }).then(function(gradients) {
       
@@ -57,17 +60,20 @@ module.exports = function (Models) {
       include: [
         { 
           model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
-          include: [{ model: UserProfile }] }, 
-          { 
-            model: Comment, 
-            include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
-              include: [{ model: UserProfile }]
-            }] 
+          include: [{ model: UserProfile }] 
+        }, 
+        { 
+          model: Comment, 
+          include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+            include: [{ model: UserProfile }]
           }] 
-        }).then(function(gradient) {
+        },{
+          model: Heart
+        }] 
+      }).then(function(gradient) {
 
       if (!gradient) {
-        res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
+        return res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
       } else {
 
         gradient.User.dataValues = _.omit(gradient.User.dataValues, ['password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid']);
@@ -85,20 +91,81 @@ module.exports = function (Models) {
     });
   });
 
+  router.route('/:permalink/heart').post(tokenUtils.middleware(), function(req, res, next){
+    Gradient.findOne({
+      where: { permalink: req.params.permalink }
+    }).then(function(gradient){
+
+      if (!gradient) {
+        return res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
+      } else {
+
+        gradient.getHearts({ where: { UserId: req.user.id, GradientId: gradient.id } }).then(function(hearts){
+
+          if (!hearts || hearts.length == 0) {
+
+            console.log('no hearts');
+
+            User.findOne({ where: { id: req.user.id } }).then(function(user){
+
+              Heart.create().then(function(newHeart){
+                
+                gradient.addHeart(newHeart).then(function(newlyAssignedGradient){
+
+                  newHeart.setUser(user).then(function(assignedGradientHeart){
+
+                    newlyAssignedGradient.getHearts().then(function(finalGradientHearts){
+
+                      var finalGradient = newlyAssignedGradient.dataValues;
+
+                      finalGradient.Hearts = finalGradientHearts;
+
+                      res.status(200).json({
+                        success: true,
+                        message: '1 gradient found.',
+                        gradientFound: finalGradient
+                      });
+
+                    });
+
+                  });
+
+                });
+
+              });
+
+            });
+
+          } else {
+            return res.status(304);
+          }
+
+        });
+
+      }
+
+    }).catch(function(err){
+      console.log(err);
+      return next(err);
+    });
+  });
+
 router.route('/by/:username').get(function(req, res, next) {
   User.findOne({
     where: { username: req.params.username }, 
     include: [
       { 
         model: Gradient,
-        include: [{
-          model: User,
-            include: [{ model: UserProfile }]
+          include: [{
+            model: User,
+              include: [{ model: UserProfile }]
           },{ 
-          model: Comment, 
-            include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
-              include: [{ model: UserProfile }] 
-            }] 
+            model: Comment, 
+              include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+                include: [{ model: UserProfile }] 
+          },{
+            model: Heart
+          }] 
         }]
       }] 
     }).then(function(user) {
@@ -128,8 +195,8 @@ router.route('/by/:username').get(function(req, res, next) {
         model: Comment, 
         include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
           include: [{ model: UserProfile }] 
-        }] 
-      }] }).then(function(gradient) {
+      }] 
+    }] }).then(function(gradient) {
 
       if (!gradient) {
         res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
@@ -257,11 +324,13 @@ router.route('/by/:username').get(function(req, res, next) {
             Gradient.create(gradientObject).then(function(gradient){
 
               gradient.setUser(author).then(function(authoredGradient){
+
                 res.status(200).json({
                   success: true,
                   message: 'Gradient created.',
                   gradientCreated: authoredGradient
                 }); 
+                
               }).catch(function(err){
                 console.log(err);
                 return next(err);
