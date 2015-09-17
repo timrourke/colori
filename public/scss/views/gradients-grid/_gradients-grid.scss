@@ -17,7 +17,7 @@
 		position:absolute;
 		display:block;
 		content:'';
-		bottom:1.75em;
+		bottom:1.525em;
 		left:0;
 		width:100%;
 		height:0.05em;
@@ -61,6 +61,10 @@
 	@include layout(12 0.25 split);
 }
 
+gradient-item {
+	position:relative;
+}
+
 .gradientItem {
 	@include span(4 of 12);
 	overflow:hidden;
@@ -73,6 +77,14 @@
 	border-radius:10px/10px;
 	margin-bottom:1em;
 	z-index:1;
+	@media all and (max-width:700px) {
+		width:100%;
+		padding-left:0;
+		padding-right:0;
+		margin-left:0;
+		margin-right:0;
+		padding-bottom:33.33333%;
+	}
 }
 
 .gradientItem .gradient__gradient {

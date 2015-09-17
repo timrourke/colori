@@ -29,16 +29,35 @@ angular.module('coloriAppAnimator', [])
 		});
 	};
 
+	this.fadeInUp = function($element, delay) {
+		return $q(function(resolve){
+			$($element).velocity({
+				opacity: 1,
+				translateY: [0, '100px']
+			}, {
+				delay: (delay * 75) + 300,
+				duration: 700,
+				complete: function() {
+					resolve();
+				}
+			});
+		});
+	}
+
 	this.scrollTo = function($element, container) {
-		console.log('hi')
+		//Absurdly high negative offset ensures comment list will be at the top of the list upon first view.
 		return $q(function(resolve){
 			$($element).velocity('scroll', {
 				container: $(container),
+				offset: '-10000',
 				duration: 200,
 				complete: function() {
-					console.log('done animating');
 					resolve();
 				}
+			});
+			$($element).velocity({
+				translateX: [0, '-100%'],
+				opacity: [1,0]	
 			});
 		});
 	};

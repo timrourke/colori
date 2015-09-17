@@ -65,10 +65,10 @@ h6.gradient-byline {
 }
 
 .gradient-meta__wrapper {
-	position:relative;
-	top:-0.158em;
+	position:absolute;
+	top:-.29em;
+	right:0;
 	display:block;
-	float:right;
 }
 
 .gradient-meta .icon {

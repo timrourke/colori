@@ -21,7 +21,31 @@
     </header>
     <div class="user-social__comments">
       <header class="user-comments__header">
-        {{(user.Comments.length) ? user.Comments.length + ' comments:' : 'No comments.' }}
+        <p class="gradient-meta">
+          <span class="gradient-meta__date"><label class="gradient-meta__date-label">Joined</label>{{ user.createdAt | date: 'MMMM d, yyyy' }}</span>
+          <span class="gradient-meta__wrapper">
+            <label class="gradient-meta__wrapper-label">Total Stats</label>
+            <span class="gradient__views">
+              <svg class="icon" viewBox="0 0 600 600">
+                <use xlink:href="#eye" />
+              </svg>  
+              {{user.totalviews || 0}}
+            </span>
+            <span class="gradient__hearts">
+              <svg class="icon" viewBox="0 0 30 30" preserveAspectRatio="xMidYMin slice">
+                <use xlink:href="#heart" />
+              </svg>
+              {{user.totalhearts || 0}}
+            </span>
+            <span class="gradient__comments-counter">
+              <svg class="icon" viewBox="0 0 600 600">
+                <use xlink:href="#wordbubble" />
+              </svg>  
+              {{user.Comments.length || 0}}
+            </span>  
+          </span>
+        </p>
+        <span class="gradient-commentsCount">{{(user.Comments.length) ? user.Comments.length + ' comments:' : 'No comments.' }}</span>
       </header>
       <ul class="user-comments__list">
         <li class="user-comments__list-item" ng-repeat="comment in user.Comments">
@@ -39,7 +63,7 @@
             </svg>
             <img ng-if="currentUser.UserProfile.avatar_url" class="icon site-user__avatar" src="{{currentUser.UserProfile.avatar_url}}" alt="{{currentUser.username}}" />
           </div>
-          <em>Logged in as {{currentUser.username}}. <a ng-href="" ng-click="logout()">Log out?</a></em>
+          <em>Logged in as {{currentUser.username}}. <a ng-href="#0" ng-click="logout($event)">Log out?</a></em>
         </div>
         <input type="submit">  
       </div>
@@ -188,11 +212,17 @@
       </header>
       
       <div class="gradients-grid__gradients col-group">
-        <div ng-repeat="gradientItem in gradientItems | orderBy:sortOrder">
-          
-          <gradient-item author="gradientItem.User.username" views="gradientItem.views" hearts="gradientItem.hearts" comments="gradientItem.Comments.length" gradient="gradientItem.body_autoprefixed" permalink="gradientItem.permalink" posted="gradientItem.createdAt" title="gradientItem.title" authoravatar="gradientItem.User.UserProfile.avatar_url"></gradient-item>
-          
-        </div>
+        <gradient-item 
+          author="gradientItem.User.username" 
+          views="gradientItem.views" 
+          hearts="gradientItem.hearts" 
+          comments="gradientItem.Comments.length" 
+          gradient="gradientItem.body_autoprefixed" 
+          permalink="gradientItem.permalink" 
+          posted="gradientItem.createdAt" 
+          title="gradientItem.title" 
+          authoravatar="gradientItem.User.UserProfile.avatar_url"
+          ng-repeat="gradientItem in gradientItems | orderBy:sortOrder"></gradient-item>
       </div>  
     </div>
   </section>

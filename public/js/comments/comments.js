@@ -6,6 +6,7 @@ angular.module('coloriAppComments', [])
 		scope: {
 			body: '=',
 			author: '=',
+			authoravatar: '=',
 			posted: '='
 		},
 		link: {

@@ -135,12 +135,16 @@ module.exports = function(sequelize, Sequelize) {
 		body: 										{ type: Sequelize.TEXT, allowNull: false, 
 			validate: {
 				len: {
-					args: [4, 200],
-					msg: 'Sorry, your gradient\'s title must be between 4 and 200 characters long.'
+					args: [0, 2000],
+					msg: 'Sorry, your comment must be under 2000 characters long.'
 				}
 			}
 		},
 		hearts: 									{ type: Sequelize.INTEGER, default: 0 }
+	});
+
+	var Heart = sequelize.define('Heart', {
+
 	});
 
 	User.hasOne(UserProfile);
@@ -148,10 +152,13 @@ module.exports = function(sequelize, Sequelize) {
 	User.hasMany(Gradient);
 	User.hasMany(Comment);
 	Gradient.hasMany(Comment);
+	Gradient.hasMany(Heart);
 	Gradient.belongsTo(User);
 	Comment.belongsTo(User);
 	Comment.belongsTo(Gradient);
 	Comment.hasMany(Comment);
+	Comment.hasMany(Heart);
+	Heart.belongsTo(User);
 
 	/*
 	 * Use the pattern defined below to create associations.

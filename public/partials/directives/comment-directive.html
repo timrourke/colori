@@ -1,9 +1,10 @@
 <article class="gradient-comment">
 	<header class="gradient-comment__header">
 		<div class="gradient-comment__author-avatar">
-      <svg ng-if="user.UserProfile.avatar_url == null" class="icon site-user__avatar" viewBox="0 0 600 600">
+      <svg ng-if="authoravatar == null" class="icon site-user__avatar" viewBox="0 0 600 600">
         <use xlink:href="#anonymous_user" />
       </svg>
+      <img class="icon site-user__avatar" ng-if="authoravatar != null" src="{{authoravatar}}" alt="{{author}}">
     </div>
     <div class="gradient-comment__meta">
     	<span class="gradient-comment__author"><a ui-sref="user({ username: author })">{{author}}</a></span>

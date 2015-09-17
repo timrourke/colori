@@ -1,0 +1,19 @@
+<button class="gradient-string-toggle" ng-click="closeCss()">
+  <svg style="fill:{{sortedColorStops[0].color || 'white'}};" class="icon" viewBox="0 0 600 600">
+    <use xlink:href="#code" />
+  </svg>
+</button>
+<md-content class="gradientString" class="md-padding">
+  <md-tabs md-dynamic-height="" md-border-bottom="">
+    <md-tab label="CSS">
+      <md-content class="md-padding" md-scroll>
+        <pre>{{cssgradientstring | cssFormatFilter}}</pre>
+      </md-content>
+    </md-tab>
+    <md-tab md-scroll-y label="CSS Autoprefixed">
+      <md-content md-scroll-y class="md-padding">
+        <pre>{{cssgradientstringautoprefixed | cssFormatFilter}}</pre>
+      </md-content>
+    </md-tab>
+  </md-tabs>
+</md-content>

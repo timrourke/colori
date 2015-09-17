@@ -41,8 +41,8 @@
         <span class="gradient-commentsCount">{{(gradient.Comments.length) ? gradient.Comments.length + ' comments:' : 'No comments.' }}</span>
       </header>
       <ul class="gradient-comments__list">
-        <li class="gradient-comments__list-item" ng-repeat="comment in gradient.Comments">
-          <comment-directive body="comment.body" author="comment.User.username" posted="comment.createdAt"></comment-directive>
+        <li class="gradient-comments__list-item" ng-repeat="comment in comments | orderBy: '-createdAt' | date">
+          <comment-directive body="comment.body" author="comment.author" posted="comment.createdAt" authoravatar="comment.authoravatar"></comment-directive>
         </li>
       </ul>
     </div>
@@ -84,7 +84,7 @@
     
     <div class="wrapper gradient-wrapper">
 
-      <textarea class="gradient-string" ng-class="{'gradient-string--open': showCss, 'gradient-string--close': !showCss}">{{gradientCssString}}</textarea>
+      <css-gradient-string ng-show="showCss" ng-class="{'gradient-string--open': showCss, 'gradient-string--close': !showCss}" cssGradientString="gradientCssString" cssGradientStringAutoprefixed="gradient.body_autoprefixed" showcss="showCss"></css-gradient-string>
 
       <div class="gradient"></div>
       <style>

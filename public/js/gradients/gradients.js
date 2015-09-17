@@ -114,6 +114,20 @@ angular.module('coloriAppGradients', [])
     }
 
   }])
+  .filter('cssFormatFilter', function() {
+	  return function(input) {
+	    input = input || '';
+	    var out = input.split('\t').join('\t');
+	    out = out.replace(/\s\s+/g, '\n\t');
+	    out = out.split(';').join(';\n\n');
+	    out = out.split(', ').join(',\n\t');
+	    out = out.split('gradient(\n\t').join('gradient(');
+	    out = out.split('gradient(').join('gradient(\n\t');
+	    out = out.split(':').join(':\n\t');
+
+	    return out;
+	  };
+	})
 	.factory('CommentSaveFailed', ['$mdDialog', function($mdDialog){
 
     return function(message) {
@@ -127,8 +141,51 @@ angular.module('coloriAppGradients', [])
     }
 
   }])
+  .directive('cssGradientString',  ['animator', function(animator) {
+		return {
+			restrict: 'E',
+			scope: {
+				cssgradientstring: '=',
+				cssgradientstringautoprefixed: '=',
+				showcss: '='
+			},
+			templateUrl: '/partials/directives/css-gradient-string.html',
+			link: function(scope, element, attributes) {
+				scope.closeCss = function() {
+					console.log('hi');
+					scope.showcss = false;
+				}
+			}
+		}
+	}])
 	.controller('gradientController', ['$scope', '$compile', '$location', 'colorStopRegister', 'gradientService', '$stateParams', 'GradientSaveFailed', 'ToastFactory', 
 		function($scope, $compile, $location, colorStopRegister, gradientService, $stateParams, GradientSaveFailed, ToastFactory) {
+
+		function flattenCommentsObject(commentsInput) {
+			console.log();
+			//Reprocess into flat array for sorting.
+
+			if (Array.isArray(commentsInput)) {
+				for(var i = 0; i < commentsInput.length; i++) {
+					var commentTemp = {
+						body: commentsInput[i].body,
+						createdAt: commentsInput[i].createdAt,
+						author: commentsInput[i].User.username,
+						authoravatar: commentsInput[i].User.UserProfile.avatar_url
+					}
+					$scope.comments.push(commentTemp);
+				}
+			} else {
+				var commentTemp = {
+					body: commentsInput.body,
+					createdAt: commentsInput.createdAt,
+					author: commentsInput.User.username,
+					authoravatar: commentsInput.User.UserProfile.avatar_url
+				}
+				$scope.comments.push(commentTemp);
+			}
+			
+		}
 
 		$scope.gradient = {};
 
@@ -138,6 +195,11 @@ angular.module('coloriAppGradients', [])
 				gradientService.getGradient($stateParams.permalink,
 					function(res){
 						$scope.gradient = res.gradientFound;
+						
+						$scope.comments = [];
+
+						flattenCommentsObject(res.gradientFound.Comments);						
+
 						addExistingColorPickers(res.gradientFound.color_stops);
 						$scope.colorStops = colorStopRegister.getColorStops();
 					}, function(err){
@@ -162,6 +224,11 @@ angular.module('coloriAppGradients', [])
 			$scope.showCss = !$scope.showCss;
 		};
 
+		$scope.closeCss = function() {
+			console.log('hi');
+			$scope.showCss = false;
+		};
+
 		$scope.toggleSocialPanel = function() {
 			$scope.showSocial = !$scope.showSocial;
 		}
@@ -183,7 +250,7 @@ angular.module('coloriAppGradients', [])
 					$scope.newComment = {
 					 	body: ''
 					 };
-					$scope.gradient.Comments.push(res.commentCreated);
+					flattenCommentsObject(res.commentCreated);
 				}, function(err){
 					CommentSaveFailed(err.message).then(function(){
 						console.log(err);
@@ -341,7 +408,7 @@ angular.module('coloriAppGradients', [])
 			template: '<button type="button" ng-click="addColorPicker()"><svg style="fill:{{sortedColorStops[0].color || \'white\'}};" class="icon" viewBox="0 0 600 600"><use xlink:href="#eyedropper_45_add" /></svg></button>'
 		};
 	}])
-.directive('gradientItem', [function() {
+.directive('gradientItem', ['animator', function(animator) {
 	return {
 		restrict: 'E',
 		scope: {
@@ -357,7 +424,9 @@ angular.module('coloriAppGradients', [])
 		},
 		templateUrl: '/partials/directives/gradient-item.html',
 		link: function(scope, element, attributes) {
-
+			element[0].querySelector('.gradientItem').style.opacity = 0;
+			
+			animator.fadeInUp(element[0].querySelector('.gradientItem'), scope.$parent.$index);
 		}
 	}
 }])

@@ -26,3 +26,102 @@
 .gradient-editor .tools svg {
 	filter:invert(100%) grayscale(100%);
 }
+
+css-gradient-string {
+	position:absolute;
+	top:10em;
+	left:50%;
+  transition:transform 0.7s ease-in-out;
+  z-index:30000;
+  width:80%;
+	max-width:20em;
+	border-radius:10px/10px;
+	box-shadow: 0 3px 7px rgba(0,0,0,0.125);
+	overflow-y:scroll;
+	@media all and (max-width: 800px) {
+		left:5%;
+		width:90%;
+		max-width: none;
+	}
+}
+
+css-gradient-string .gradientString {
+	background-color:white;
+	border-radius:10px/10px;
+	font-size:0.8em;
+}
+
+css-gradient-string md-pagination-wrapper {
+	background-color:$darkgrey;
+}
+
+css-gradient-string.gradient-string--close {
+	transform:translateX(-50%) translateY(-1000px) scale(0);
+	@media all and (max-width:800px){
+		transform:translateX(0) translateY(-1000px) scale(0);
+	}
+}
+
+css-gradient-string.gradient-string--open {
+	transform:translateX(-50%) translateY(-25%) scale(1);
+	@media all and (max-width:800px){
+		transform:translateX(0) translateY(0) scale(1);
+		top:2.5%;
+		left:5%;
+		width:90%;
+		max-width:none;
+		md-tab,
+		md-tabs,
+		md-tab-item,
+		md-content,
+		md-tabs-canvas {
+			overflow-y:scroll !important;
+			overflow-x:hidden;
+		}
+		.gradientString md-tab-content.md-no-scroll {
+			overflow-y:scroll !important;
+			overflow-x:hidden;
+		}
+		.gradientString {
+			//transform:translateX()
+		}
+	}
+}
+
+css-gradient-string .gradient-string-toggle {
+	position:absolute;
+	top:0.75em;
+	right:0.75em;
+	height:1.5em;
+	width:1.5em;
+	margin:0;
+	padding:0;
+	background:none;
+	border:none;
+	outline:none;
+	z-index:30000;
+}
+
+md-tabs {  // Based on earlier post, required to allow scrolling internal tab content
+  display: flex;
+  flex-direction: column;
+}
+.md-tabs-content {  // Based on earlier post, required to get `.md-header` to show correct 'tabs' height
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+.md-tab-content { // New style adjustment with flex direction set to row to allow tab contents to flex the horizontal space as well as overflow-y to allow tab content to scroll
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow-y: scroll;
+}
+
+.gradient-string-toggle.gradient-string--open {
+	border:1px solid #00FC6B;
+}
+
+.gradient-string-toggle.gradient-string--open svg {
+	fill:#00FC6B;
+}
