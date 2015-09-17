@@ -70,20 +70,27 @@ module.exports = function (Models) {
         },{
           model: Heart
         }] 
-      }).then(function(gradient) {
+      }).then(function(gradient){
 
-      if (!gradient) {
-        return res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
-      } else {
+        gradient.increment({ views: 1 }).then(function(incrementedGradient) {
 
-        gradient.User.dataValues = _.omit(gradient.User.dataValues, ['password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid']);
+        if (!incrementedGradient) {
+          return res.status(404).json({ success: false, message: 'No gradients found with a permalink of ' + req.params.permalink + '.' });
+        } else {
 
-        res.status(200).json({
-          success: true,
-          message: '1 gradient found.',
-          gradientFound: gradient
-        }); 
-      }
+          incrementedGradient.User.dataValues = _.omit(incrementedGradient.User.dataValues, ['password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid']);
+
+          res.status(200).json({
+            success: true,
+            message: '1 gradient found.',
+            gradientFound: incrementedGradient
+          }); 
+        }
+
+      }).catch(function(err){
+        console.log(err);
+        return next(err);
+      });
 
     }).catch(function(err) {
       console.log(err);
