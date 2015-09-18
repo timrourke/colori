@@ -15,6 +15,14 @@ angular.module('coloriAppUsers', [])
         error(err.data);
       });
     },
+    commentOnUser: function(username, comment, success, error) {
+      console.log('attempting post request');
+      $http.post(urls.BASE + '/users/' + username + '/comment', comment).then(function(res){
+        success(res.data);
+      }, function(err){
+        error(err.data);
+      });
+    },
     updateUser: function(username, updatedUser, success, error) {
       $http.put(urls.BASE + '/users/' + username, updatedUser).then(function(res){
         success(res.data);
@@ -50,27 +58,10 @@ angular.module('coloriAppUsers', [])
   function($rootScope, $scope, Users, Auth, gradientService, $stateParams, $timeout, Upload, urls) {
 
   $scope.user = [];
+  $scope.comments = [];
 
-  if ($rootScope.currentUser.UserProfile) {
-    $scope.updatedUser = {
-      username: $rootScope.currentUser.username,
-      email: $rootScope.currentUser.email,
-      password: '',
-      confirmpassword: '',
-      UserProfile: {
-        avatar_url: $rootScope.currentUser.UserProfile.avatar_url,
-        bio: $rootScope.currentUser.UserProfile.bio,
-        website: $rootScope.currentUser.UserProfile.website,
-        twitter_handle: $rootScope.currentUser.UserProfile.twitter_handle,
-        facebook_handle: $rootScope.currentUser.UserProfile.facebook_handle,
-        github_handle: $rootScope.currentUser.UserProfile.github_handle,
-        dribble_handle: $rootScope.currentUser.UserProfile.dribble_handle,
-        codepen_handle: $rootScope.currentUser.UserProfile.codepen_handle
-      }
-    };
-  }
-
-  $scope.showSocial = true;
+  $scope.showProfile = true;
+  $scope.showSocial = false;
   $scope.showForm = true;
   $scope.showUpdateUserProfile = false;
 
@@ -78,11 +69,37 @@ angular.module('coloriAppUsers', [])
     $scope.showUpdateUserProfile = !$scope.showUpdateUserProfile;
   }
 
+  $scope.toggleUserProfile = function(){
+    console.log($scope.showProfile)
+    $scope.showProfile = !$scope.showProfile;
+  }
+
+  $scope.newComment = {
+    body: ''
+  }
+
+  $scope.commentOnUser = function(newComment) {
+    console.log(newComment);
+    Users.commentOnUser($stateParams.username, newComment,
+      function(res){
+        console.log(res);
+        $scope.user = res.commentedUser;
+        $scope.comments = res.commentedUser.UserProfile.Comments;
+        $scope.newComment = {
+          body: ''
+        }
+      }, function(err){
+        console.log(err);
+      });
+  }
+
   $scope.init = function() {
     Users.getUser(
       $stateParams.username,
       function(res) {
         $scope.user = res.foundUser;
+        $scope.comments = res.foundUser.UserProfile.Comments;
+        console.log(res); 
         if ($scope.user.id == Auth.getUser().id) {
           return $scope.showForm = true;
         } else {
@@ -103,44 +120,7 @@ angular.module('coloriAppUsers', [])
 
   $scope.init();
 
-  $scope.updateUser = function(updatedUser){
-    Users.updateUser($stateParams.username, updatedUser, function(res) {
-      $rootScope.currentUser = res.updatedUser;
-      $scope.updatedUser = res.updatedUser;
-      $scope.updatedUser.password = '';
-      $scope.updatedUser.confirmpassword = '';
-      if (Auth.getUser().id == res.updatedUser.id) {
-        Auth.setUser(res.updatedUser);
-      }
-    }, function(err) {
-
-    });
-  }
-
-  $scope.uploadAvatar = function(file){
-    file.upload = Upload.upload({
-      url: urls.BASE + '/users/' + $stateParams.username + '/avatar',
-      method: 'POST',
-      fields: {username: $scope.updatedUser.username},
-      file: file,
-      fileFormDataName: $scope.updatedUser.username
-    });
-
-    file.upload.then(function (response) {
-      $timeout(function () {
-        $rootScope.currentUser.UserProfile.avatar_url = response.data.url;
-        file.result = response.data;
-      });
-    }, function (response) {
-      if (response.status > 0)
-        $scope.errorMsg = response.status + ': ' + response.data;
-    });
-
-    file.upload.progress(function (evt) {
-      // Math.min is to fix IE which reports 200% sometimes
-      file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
-    });
-  }
+  
 
 }]).controller('ConfirmEmailController', ['$scope', '$stateParams', '$location', 'Users',  function($scope, $stateParams, $location, Users){
 
@@ -160,5 +140,94 @@ angular.module('coloriAppUsers', [])
   }
 
   $scope.init();
+
+}])
+.directive('userProfile', ['$rootScope', '$timeout', '$stateParams', 'Users', 'Auth', 'Upload', 'urls', 'ToastFactory',
+  function($rootScope, $timeout, $stateParams, Users, Auth, Upload, urls, ToastFactory){
+
+    return {
+      restrict: 'E',
+      scope: {
+        show: '='
+      },
+      templateUrl: '/partials/directives/user-profile-editor.html',
+      link: function(scope, element, attributes){
+
+        if ($rootScope.currentUser && $rootScope.currentUser.UserProfile) {
+          scope.updatedUser = {
+            username: $rootScope.currentUser.username,
+            email: $rootScope.currentUser.email,
+            password: '',
+            confirmpassword: '',
+            UserProfile: {
+              avatar_url: $rootScope.currentUser.UserProfile.avatar_url,
+              bio: $rootScope.currentUser.UserProfile.bio,
+              website: $rootScope.currentUser.UserProfile.website,
+              twitter_handle: $rootScope.currentUser.UserProfile.twitter_handle,
+              facebook_handle: $rootScope.currentUser.UserProfile.facebook_handle,
+              github_handle: $rootScope.currentUser.UserProfile.github_handle,
+              dribble_handle: $rootScope.currentUser.UserProfile.dribble_handle,
+              codepen_handle: $rootScope.currentUser.UserProfile.codepen_handle
+            }
+          };
+        }
+
+        scope.close = function(){
+          scope.show = !scope.show;
+        }
+
+        scope.updateUser = function(updatedUser){
+          Users.updateUser($stateParams.username, updatedUser, function(res) {
+            $rootScope.currentUser = res.updatedUser;
+            scope.updatedUser = res.updatedUser;
+            scope.updatedUser.password = '';
+            scope.updatedUser.confirmpassword = '';
+            if (Auth.getUser().id == res.updatedUser.id) {
+              Auth.setUser(res.updatedUser);
+            }
+            ToastFactory('User profile successfully updated.', 3000, 'success').then(function(){
+              console.info('User profile successfully updated.');
+            }); 
+          }, function(err) {
+
+          });
+        }
+
+        scope.uploadAvatar = function(file){
+          file.upload = Upload.upload({
+            url: urls.BASE + '/users/' + $stateParams.username + '/avatar',
+            method: 'POST',
+            fields: {username: scope.updatedUser.username},
+            file: file,
+            fileFormDataName: scope.updatedUser.username
+          });
+
+          file.upload.then(function (response) {
+            $timeout(function () {
+              console.log(response);
+              $rootScope.$apply(function(){
+                $rootScope.currentUser.UserProfile.avatar_url = response.data.url;  
+              })
+              
+              file.result = response.data;
+
+            });
+            ToastFactory('User avatar successfully updated.', 3000, 'success').then(function(){
+              console.info('User avatar successfully updated.');
+            }); 
+          }, function (response) {
+            if (response.status > 0)
+              scope.errorMsg = response.status + ': ' + response.data;
+          });
+
+          file.upload.progress(function (evt) {
+            // Math.min is to fix IE which reports 200% sometimes
+            file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total));
+          });
+        }
+
+      }  
+    }
+    
 
 }])

@@ -4,6 +4,7 @@ var debug = require('debug')('app:routes:users' + process.pid),
     _ = require("lodash"),
     util = require('util'),
     path = require('path'),
+    uuid = require('uuid'),
     tokenUtils = require(path.join(__dirname, '..', '..', 'utils', 'tokenUtils')),
     async = require('async'),
     Router = require("express").Router,
@@ -40,7 +41,18 @@ module.exports = function (Models, s3bucket) {
   var findUserByUsername = function(username, callback) {
     User.findOne({ 
       where: { username: username }, 
-      include: { model: UserProfile }, 
+      include: { 
+        model: UserProfile,
+          include: {
+            model: Comment,
+              include: {
+                model: User,
+                  include: {
+                    model: UserProfile
+                  }
+              }
+          }
+      }, 
       attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'] }).then(function(user) {
 
       if (!user) {
@@ -72,7 +84,7 @@ module.exports = function (Models, s3bucket) {
         isUserInReqBodySelfOrAdmin(user, req, res, function(){
 
           if (updatedUserProperties.password && updatedUserProperties.password != updatedUserProperties.confirmpassword) {
-            res.status(449).json({ success: false, message: "Sorry, your password was not changed. The new password must match the confirmation password." })
+            return res.status(449).json({ success: false, message: "Sorry, your password was not changed. The new password must match the confirmation password." })
           }
 
           if (!updatedUserProperties.password) {
@@ -140,7 +152,6 @@ module.exports = function (Models, s3bucket) {
             });
           }
 
-          
         });
       }
 
@@ -174,12 +185,12 @@ module.exports = function (Models, s3bucket) {
       if (err) {
         return next(err);
       } else if (!updatedUser || updatedUser == null) {
-        res.status(404).json({ success: false, message: 'Sorry, no users found with the username ' + req.params.username + '.' }); 
+        return res.status(404).json({ success: false, message: 'Sorry, no users found with the username ' + req.params.username + '.' }); 
       } else {
 
         var returnedUpdatedUser = updatedUser.get({
-            plain: true
-          });
+          plain: true
+        });
 
         res.json({
           success: true,
@@ -192,6 +203,70 @@ module.exports = function (Models, s3bucket) {
     });
   });
 
+  router.route('/:username/comment').post(tokenUtils.middleware(), function(req, res, next) {
+
+    Comment.create(req.body).then(function(comment){
+
+      User.findOne({ where: { id: req.user.id } }).then(function(author){
+
+        comment.setUser(author).then(function(assignedComment){
+
+          User.findOne({ where: { username: req.params.username }, include: { model: UserProfile } }).then(function(userCommentedUpon){
+
+            userCommentedUpon.UserProfile.addComment(assignedComment).then(function(finalUserProfile){
+
+              finalUserProfile.getComments(
+                { include: 
+                  { 
+                    model: User,
+                      include: { model: UserProfile }
+                  } 
+                }).then(function(userProfileComments){
+
+                var finalUser = _.omit(userCommentedUpon.dataValues, ['password', 'email_verified', 'email_verification_uuid', 'password_reset_uuid']);
+
+                finalUser.UserProfile = finalUserProfile.dataValues;
+
+                finalUser.UserProfile.Comments = userProfileComments;
+
+                res.json({
+                  success: true,
+                  message: 'Comment successfully posted.',
+                  commentedUser: finalUser
+                });
+
+              }).catch(function(err){
+                console.log(err);
+                return next(err);
+              });
+
+            }).catch(function(err){
+              console.log(err);
+              return next(err);
+            });
+
+          }).catch(function(err){
+            console.log(err);
+            return next(err);
+          });
+
+        }).catch(function(err){
+          console.log(err);
+          return next(err);
+        });
+
+      }).catch(function(err){
+        console.log(err);
+        return next(err);
+      });
+
+    }).catch(function(err){
+      console.log(err);
+      return next(err);
+    });
+
+  });
+
   router.route('/:username/avatar').post(tokenUtils.middleware(), function(req, res, next) {
     var form = new multiparty.Form({
       maxFields: 2
@@ -202,7 +277,7 @@ module.exports = function (Models, s3bucket) {
     //Set the destPath to be the uploading user's username.
     form.on('field', function(name, value){
       if (name === 'username') {
-        destPath = 'avatar_' + value;
+        destPath = 'avatar_' + value + uuid.v4();
       }
     });
 
@@ -231,8 +306,6 @@ module.exports = function (Models, s3bucket) {
         }
       
         findUserByUsername(req.params.username, function(err, user){
-          
-          console.log(user);
 
           isUserInReqBodySelfOrAdmin(user, req, res, function(){
 

@@ -149,6 +149,7 @@ module.exports = function(sequelize, Sequelize) {
 	UserProfile.belongsTo(User);
 	User.hasMany(Gradient);
 	User.hasMany(Comment);
+	UserProfile.hasMany(Comment);
 	Gradient.hasMany(Comment);
 	Gradient.hasMany(Heart);
 	Gradient.belongsTo(User);

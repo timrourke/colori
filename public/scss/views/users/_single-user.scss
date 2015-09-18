@@ -12,12 +12,17 @@
 	left:0;
 	width:100%;
 	height:100%;
-	padding-left:320px;
+	padding-left:0;
+	padding-right:0;
 	overflow-y:scroll;
 	padding-bottom:4.5em;
+	transition:all 0.3s ease-in-out;
+	&.user-profile--open {
+		padding-left:320px;
+	}
 }
 
-.user__wrapper .gradientItem {
+.user__wrapper .user-profile--open .gradientItem {
 	@media all and (max-width:1020px){
 		width:48%;
 		padding-left:1%;
@@ -44,6 +49,9 @@
 	z-index:2000;
 	margin-bottom:1.5em;
 	box-shadow: 3px 0 5px rgba(0,0,0,0.2);
+	&.user-profile--open {
+		transform:translateX(0);
+	}
 }
 
 .user-social.user-social--open {
@@ -52,6 +60,10 @@
 
 .user-editor.user-social--open {
 	transform:translateX(320px);
+}
+
+.user-comments__header {
+	padding-top:0.25em;
 }
 
 .user-comments__header .gradient-meta {
@@ -77,19 +89,32 @@
 	top:-1.41666667em;
 }
 
+.site-user__toggleProfileEditor {
+	position:absolute;
+	background:transparent;
+	border:none;
+	width:1.25em;
+	height:1.25em;
+	top:1em;
+	right:2.5em;
+	padding:0;
+	margin:0;
+}
+
 .site-user__toggleProfile {
 	position:absolute;
 	background:transparent;
 	border:none;
-	width:1em;
-	height:1em;
+	width:1.25em;
+	height:1.25em;
 	top:1em;
 	right:0.5em;
 	padding:0;
 	margin:0;
 }
 
-.site-user__toggleProfile svg {
+.site-user__toggleProfile svg,
+.site-user__toggleProfileEditor svg {
 	position:absolute;
 	top:0;
 	left:0;
@@ -132,12 +157,13 @@
 
 .user-social__comments {
 	position:relative;
-	padding:1em;
-	overflow-y:scroll;
+	padding:1em 0 16em 0;
+	height:100%;
 }
 
 .user-comments__header {
 	margin-bottom:0.8em;
+	padding:1em 1em 0 1em;
 }
 
 .user-comment-form {
@@ -175,9 +201,15 @@
 
 .user-comments__list {
 	list-style-type:none;
-	padding:0;
+	padding:0 0 8em 0;
 	margin:0;
-	font-size:0.8em;
+	font-size:0.8em;	
+	height:100%;
+	overflow-y:scroll;
+}
+
+.user-comments__list-item {
+	padding:0 1em;
 }
 
 .user-comment__card__avatar {
@@ -230,6 +262,25 @@ comment-directive {
 	border-top:1px solid rgba(0,0,0,0.2);
 }
 
+user-profile {
+	position:absolute;
+	width:100%;
+	height:100%;
+}
+
+user-profile .user-profile-wrapper {
+	position:absolute;
+	padding-top:3em;
+	width:320px;
+	height:100%;
+}
+
+user-profile form {
+	display:block;
+	max-width: 30em;
+	margin:1em auto;
+}
+
 .user__updateUser {
 	@include layout(12 0.5 split);
 	@extend .clearfix;
@@ -237,8 +288,9 @@ comment-directive {
 	position:absolute;
 	left:0;
 	top:0;
-	width:100%;
+	width:320px;
 	height:100%;
+	min-height:100%;
 	transform:translateY(-150%);
 	opacity:0;
 	transition:all 0.3s ease-in-out;
@@ -259,18 +311,6 @@ comment-directive {
 	opacity:1;
 }
 
-.user__updateUser__accountDetails {
-	@include span(4 of 12);
-}
-
-.user__updateUser__userProfile {
-	@include span(4 of 12);
-}
-
-.user__updateUser__userProfile2 {
-	@include span(4 of 12 last);
-}
-
 .user__updateUser label input,
 .user__updateUser label textarea {
 	margin-top:0.125em;
@@ -280,9 +320,39 @@ comment-directive {
 	width:100%;
 }
 
-.user__updateUser input[type="submit"] {
-	max-width:8em;
+.user__updateUser input[type="submit"],
+.user__updateUser button.cancel {
+	position:absolute;
+	bottom:5.5em;
+	right:1em;
+	width:8em;
 	display:block;
-	margin-left:auto;
-	margin-right:auto;
+	z-index:3000;
+	margin-left:0;
+	margin-right:0;
+}
+
+.user__updateUser button.cancel {
+	left:1em;
+	color:$orange;
+}
+
+.toggleUserProfile {
+	float:left;
+	position:relative;
+	margin:0 1em 0 0;
+	width:2em;
+	height:2em;
+	z-index:3000;
+	background:none;
+	border:none;
+	padding:0;
+	svg {
+		position: absolute;
+		top:0;
+		left:0;
+		width:100%;
+		height:100%;
+		fill:$lightgrey;
+	}
 }

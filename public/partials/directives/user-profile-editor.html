@@ -1,0 +1,142 @@
+<div class="user-profile-wrapper">
+  <md-tabs ng-class="{'user__updateUser--open': show, 'user__updateUser--close': !show}" class="user__updateUser">
+    
+    <md-tab>
+      <md-tab-label>
+        User Info
+      </md-tab-label>
+      <md-tab-content>
+        <form ng-show="currentuser.username == user.username" ng-class="{'user__updateUser--open': show, 'user__updateUser--close': !show}" class="user__updateUserAvatar" name="user__updateUserAvatar">
+
+          <h5>Edit Profile Photo</h5>
+
+          <label>
+            Avatar Image
+            <input type="file" 
+              ngf-select name="file" 
+              accept="image/*" 
+              ng-model="updateUser.UserProfile.avatar_url" 
+              ngf-max-size="2MB" 
+              ngf-resize="{width: 200, height: 200, quality: 1}"
+              ngf-capture="'camera'"
+              ngf-pattern="'.png,.jpg'"
+              required>
+
+            <em ng-show="user__updateUserAvatar.file.$error.maxSize">
+              File too large 
+              {{picFile.size / 1000000|number:1}}MB: max {{picFile.$errorParam}}
+            </em>
+
+            <em ng-show="user__updateUserAvatar.file.$error.pattern">
+              File must be PNG or JPG format, with the extension '.png' or '.jpg'
+            </em>
+
+            <img 
+              ng-show="user__updateUserAvatar.file.$valid" 
+              ngf-src="!picFile.$error && updateUser.UserProfile.avatar_url"
+              class="thumb">
+            <br>
+            <button ng-disabled="!user__updateUserAvatar.$valid" 
+                    ng-click="uploadAvatar(updateUser.UserProfile.avatar_url)">Upload</button>
+            
+            <span 
+              class="progress" 
+              ng-show="updateUser.UserProfile.avatar_url.progress >= 0">
+              
+              <div 
+                style="width:{{updateUser.UserProfile.avatar_url.progress}}%" 
+                ng-bind="updateUser.UserProfile.avatar_url.progress + '%'"></div>
+            </span>
+            <span ng-show="updateUser.UserProfile.avatar_url.result">Upload Successful</span>
+            <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
+          </label>
+        </form>
+        <form ng-show="currentuser.username == user.username" ng-submit="updateUser(updatedUser)">  
+          <h5>Edit Account Details</h5>
+          
+          <label>
+            Email
+            <input type="email" placeholder="Email" ng-model="updatedUser.email">  
+          </label>
+          
+          <label>
+            New Password
+            <input type="password" ng-model="updatedUser.password">
+          </label>
+          
+          <label ng-if="updatedUser.password.length">
+            Confirm New Password
+            <input type="password" ng-model="updatedUser.confirmpassword">  
+          </label>
+
+          <button class="cancel" type="button" ng-click="close()">Cancel</button>
+          <input type="submit" value="Update">
+        </form>
+      </md-tab-content>
+    </md-tab>
+
+    <md-tab>
+      <md-tab-label>
+        User Profile
+      </md-tab-label>
+      <md-tab-body> 
+        <form ng-show="currentuser.username == user.username" ng-submit="updateUser(updatedUser)">  
+          <h5>Edit User Profile</h5>
+
+          <label>
+            Your website
+            <input type="url" placeholder="Your website's URL" ng-model="updatedUser.UserProfile.website">
+          </label>
+
+          <label>
+            Bio
+            <textarea ng-model="updatedUser.UserProfile.bio"></textarea>
+          </label>
+
+          <button class="cancel" type="button" ng-click="close()">Cancel</button>
+          <input type="submit" value="Update">
+        </form>
+      </md-tab-body>
+    </md-tab>
+
+    <md-tab>
+      <md-tab-label>
+        Social Links
+      </md-tab-label>
+      <md-tab-body>
+        <form ng-show="currentuser.username == user.username" ng-submit="updateUser(updatedUser)">  
+          <h5>Social Links</h5>
+
+          <label>
+            Twitter Handle
+            <input type="text" placeholder="@YourTwitterHandle" ng-model="updatedUser.UserProfile.twitter_handle">
+          </label>
+
+          <label>
+            Your Facebook Profile
+            <input type="url" placeholder="URL to your Facebook profile" ng-model="updatedUser.UserProfile.facebook_handle">
+          </label>
+
+          <label>
+            Your GitHub Profile
+            <input type="url" placeholder="URL to your GitHub profile" ng-model="updatedUser.UserProfile.github_handle">
+          </label>
+
+          <label>
+            Your Dribble Profile
+            <input type="url" placeholder="URL to your Dribble profile" ng-model="updatedUser.UserProfile.dribble_handle">
+          </label>
+
+          <label>
+            Your CodePen Profile
+            <input type="url" placeholder="URL to your CodePen profile" ng-model="updatedUser.UserProfile.codepen_handle">
+          </label>
+
+          <button class="cancel" type="button" ng-click="close()">Cancel</button>
+          <input type="submit" value="Update">
+        </form>
+      </md-tab-body>
+    </md-tab>
+  </md-tabs>
+  
+</div>

@@ -1,5 +1,5 @@
 <div class="user__wrapper">
-  <aside class="user-social" ng-class="{'user-social--open': showSocial, 'user-social--close': !showSocial}">
+  <aside class="user-social" ng-class="{'user-social--open': showSocial, 'user-social--close': !showSocial, 'user-profile--open': showProfile, 'user-profile--close': !showProfile}">
     <header class="user-social__card col-group clearfix">
       <div class="user-social__card__avatar">
         <svg ng-if="user.UserProfile.avatar_url == null" class="site-user__avatar" viewBox="0 0 600 600">
@@ -7,9 +7,14 @@
         </svg>
         <img class="site-user__avatar" ng-if="user.UserProfile.avatar_url != null" src="{{user.UserProfile.avatar_url}}" alt="{{user.username}}">
 
-        <button ng-show="currentUser.username == user.username" class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
+        <button ng-show="currentUser.username == user.username" class="site-user__toggleProfileEditor" type="button" ng-click="toggleUpdateUserProfile()">
           <svg viewBox="0 0 600 600">
             <use xlink:href="#edit" />
+          </svg>
+        </button>
+        <button type="button" class="site-user__toggleProfile" ng-click="toggleUserProfile()">
+          <svg viewBox="0 0 600 600">
+            <use xlink:href="#close" />
           </svg>
         </button>
         
@@ -45,10 +50,10 @@
             </span>  
           </span>
         </p>
-        <span class="gradient-commentsCount">{{(user.Comments.length) ? user.Comments.length + ' comments:' : 'No comments.' }}</span>
+        <span class="gradient-commentsCount">{{(comments.length) ? comments.length + ' comments:' : 'No comments.' }}</span>
       </header>
       <ul class="user-comments__list">
-        <li class="user-comments__list-item" ng-repeat="comment in user.Comments">
+        <li class="user-comments__list-item" ng-repeat="comment in comments | orderBy: '-createdAt' | date">
           <comment-directive body="comment.body" author="comment.User.username" posted="comment.createdAt"></comment-directive>
         </li>
       </ul>
@@ -65,135 +70,29 @@
           </div>
           <em>Logged in as {{currentUser.username}}. <a ng-href="#0" ng-click="logout($event)">Log out?</a></em>
         </div>
-        <input type="submit">  
+        <input type="submit" ng-click="commentOnUser(newComment)">  
       </div>
     </form>
   </aside>
-  
 
-  <div ng-class="{'user__updateUser--open': showUpdateUserProfile, 'user__updateUser--close': !showUpdateUserProfile}" class="user__updateUser">
-    <form ng-show="currentUser.username == user.username" ng-class="{'user__updateUser--open': showUpdateUserProfile, 'user__updateUser--close': !showUpdateUserProfile}" class="user__updateUserAvatar" name="user__updateUserAvatar">
-      <label>
-        Avatar Image
-        <input type="file" 
-          ngf-select name="file" 
-          accept="image/*" 
-          ng-model="updateUser.UserProfile.avatar_url" 
-          ngf-max-size="2MB" 
-          ngf-resize="{width: 200, height: 200, quality: 1}"
-          ngf-capture="'camera'"
-          ngf-pattern="'.png,.jpg'"
-          required>
+  <user-profile 
+    show="showUpdateUserProfile" 
+    user="user" 
+    currentuser="currentUser"
+    showprofile="showProfile"></user-profile>
 
-        <em ng-show="user__updateUserAvatar.file.$error.maxSize">
-          File too large 
-          {{picFile.size / 1000000|number:1}}MB: max {{picFile.$errorParam}}
-        </em>
-
-        <em ng-show="user__updateUserAvatar.file.$error.pattern">
-          File must be PNG or JPG format, with the extension '.png' or '.jpg'
-        </em>
-
-        <img 
-          ng-show="user__updateUserAvatar.file.$valid" 
-          ngf-src="!picFile.$error && updateUser.UserProfile.avatar_url"
-          class="thumb">
-        <br>
-        <button ng-disabled="!user__updateUserAvatar.$valid" 
-                ng-click="uploadAvatar(updateUser.UserProfile.avatar_url)">Submit</button>
-        
-        <span 
-          class="progress" 
-          ng-show="updateUser.UserProfile.avatar_url.progress >= 0">
-          
-          <div 
-            style="width:{{updateUser.UserProfile.avatar_url.progress}}%" 
-            ng-bind="updateUser.UserProfile.avatar_url.progress + '%'"></div>
-        </span>
-        <span ng-show="updateUser.UserProfile.avatar_url.result">Upload Successful</span>
-        <span class="err" ng-show="errorMsg">{{errorMsg}}</span>
-      </label>
-    </form>
-
-    <form ng-show="currentUser.username == user.username" ng-submit="updateUser(updatedUser)">
-
-      <button class="site-user__toggleProfile" type="button" ng-click="toggleUpdateUserProfile()">
-        <span class="icon">×</span> 
-      </button>
-
-      <div class="user__updateUser-wrapper">
-        <h3>Update User Info</h3> 
-
-        <div class="user__updateUser__accountDetails">
-          <h4>Account Details</h4>
-          
-          <label>
-            Email
-            <input type="email" placeholder="Email" ng-model="updatedUser.email">  
-          </label>
-          
-          <label>
-            New Password
-            <input type="password" ng-model="updatedUser.password">
-          </label>
-          
-          <label ng-if="updatedUser.password.length">
-            Confirm New Password
-            <input type="password" ng-model="updatedUser.confirmpassword">  
-          </label>
-        </div>
-        
-        <div class="user__updateUser__userProfile">
-          <h4>User Profile</h4>
-
-          <label>
-            Your website
-            <input type="url" placeholder="Your website's URL" ng-model="updatedUser.UserProfile.website">
-          </label>
-
-          <label>
-            Bio
-            <textarea ng-model="updatedUser.UserProfile.bio"></textarea>
-          </label>
-        </div>
-
-        <div class="user__updateUser__userProfile2">
-          <h4>Social Links</h4>
-
-          <label>
-            Twitter Handle
-            <input type="text" placeholder="@YourTwitterHandle" ng-model="updatedUser.UserProfile.twitter_handle">
-          </label>
-
-          <label>
-            Your Facebook Profile
-            <input type="url" placeholder="URL to your Facebook profile" ng-model="updatedUser.UserProfile.facebook_handle">
-          </label>
-
-          <label>
-            Your GitHub Profile
-            <input type="url" placeholder="URL to your GitHub profile" ng-model="updatedUser.UserProfile.github_handle">
-          </label>
-
-          <label>
-            Your Dribble Profile
-            <input type="url" placeholder="URL to your Dribble profile" ng-model="updatedUser.UserProfile.dribble_handle">
-          </label>
-
-          <label>
-            Your CodePen Profile
-            <input type="url" placeholder="URL to your CodePen profile" ng-model="updatedUser.UserProfile.codepen_handle">
-          </label>
-        </div>
-      </div>
-
-      <input type="submit" value="Update">
-    </form>
-  </div>
-
-  <section class="gradients">
+  <section class="gradients" ng-class="{'user-profile--open': showProfile, 'user-profile--close': !showProfile}">
     <div class="gradients-grid col-group">
       <header class="gradients-grid__header">
+        <div class="gradients-grid__header-title-wrap">
+          <button type="button" class="icon-button toggleUserProfile" ng-click="toggleUserProfile()">
+            <svg class="icon" viewBox="0 0 600 600">
+              <use xlink:href="#sort" />
+            </svg>
+          </button>
+          <h3>{{user.username}}'s profile</h3>  
+        </div>
+        
         <nav class="gradients-grid__nav">
           <span class="gradients-grid__nav-title">Showing gradients by {{user.username}}.</span>
           <form class="gradients-grid__nav-sort">
@@ -215,7 +114,7 @@
         <gradient-item 
           author="gradientItem.User.username" 
           views="gradientItem.views" 
-          hearts="gradientItem.hearts" 
+          hearts="gradientItem.Hearts.length" 
           comments="gradientItem.Comments.length" 
           gradient="gradientItem.body_autoprefixed" 
           permalink="gradientItem.permalink" 

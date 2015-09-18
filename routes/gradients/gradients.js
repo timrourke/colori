@@ -196,12 +196,15 @@ router.route('/by/:username').get(function(req, res, next) {
               include: [{ model: UserProfile }]
           },{ 
             model: Comment, 
-              include: [{ model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
-                include: [{ model: UserProfile }] 
+              include: [
+                { model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+                  include: [{ model: UserProfile }] 
+                },{
+                  model: Heart
+                }] 
           },{
             model: Heart
-          }] 
-        }]
+          }]
       }] 
     }).then(function(user) {
     

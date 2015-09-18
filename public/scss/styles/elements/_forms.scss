@@ -115,6 +115,13 @@ textarea {
     outline:0;
     border:2px solid $blue;
   }
+  &.icon-button:focus {
+    outline:0;
+    border:none;
+    svg {
+      fill:$blue;
+    }
+  }
 }
 
 form {

@@ -194,7 +194,6 @@ angular.module('coloriAppGradients', [])
 				$scope.comments.push(commentTemp);
 				upsert($scope.gradient.Comments, {id: commentsInput.id}, commentsInput);
 			}
-			
 		}
 
 		$scope.gradient = {};
@@ -430,7 +429,7 @@ angular.module('coloriAppGradients', [])
 	return {
 		restrict: 'E',
 		scope: {
-			title: '=',
+			gradienttitle: '=',
 			author: '=',
 			authoravatar: '=',
 			views: '=',

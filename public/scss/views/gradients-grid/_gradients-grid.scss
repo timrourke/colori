@@ -5,8 +5,20 @@
 .gradients-grid {
 	width:100%;
 	padding:1em;
-	margin:2em auto;
+	margin:0 auto 2em auto;
 	max-width:50em;
+}
+
+.gradients-grid__header {
+	padding-top:1em;
+}
+
+.gradients-grid__header-title-wrap {
+	@extend .clearfix;
+}
+
+.gradients-grid__header h3 {
+	float:left;
 }
 
 .gradients-grid__nav {
@@ -17,7 +29,7 @@
 		position:absolute;
 		display:block;
 		content:'';
-		bottom:1.525em;
+		top:1.525em;
 		left:0;
 		width:100%;
 		height:0.05em;
@@ -94,7 +106,6 @@ gradient-item {
 	width:100%;
 	height:100%;
 	background-repeat:no-repeat;
-	//border-bottom:1.75em inset transparent;
 	box-shadow:inset 0 0 3px rgba(0,0,0,0.5);
 }
 
@@ -152,12 +163,11 @@ gradient-item {
 	top:0;
 	left:0;
 	width:100%;
-	height: 75%;
-	background-image:linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0));
+	height: 100%;
+	background-image:linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0));
 	transition:all 0.4s cubic-bezier(0.4, 0.6, 0.8, 1);
 	transform:translateY(-100%);
 	opacity:0;
-	//z-index:-1;
 	.gradient__gradient:hover & {
 		transition:all 0.4s cubic-bezier(0.4, 0.6, 0.8, 1);
 		transform:translateY(0);
@@ -191,6 +201,7 @@ gradient-item {
 	transform:translateY(-200%);
 	opacity:0;
 	z-index:5;
+	color:white;
 	.gradient__gradient:hover & {
 		transition:all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
 		transform:translateY(0);
