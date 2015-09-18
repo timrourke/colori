@@ -31,7 +31,7 @@
           gradienttitle="gradientItem.title" 
           authoravatar="gradientItem.User.UserProfile.avatar_url"
           allgradients="gradientItems"
-          ng-repeat="gradientItem in gradientItems"></gradient-item>
+          ng-repeat="gradientItem in gradientItems | orderBy: 'sortOrder'"></gradient-item>
   	</div>
   </div>
 </section>
