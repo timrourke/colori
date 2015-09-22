@@ -35,7 +35,10 @@ console.log('NODE ENV CURRENTLY: ' + process.env.NODE_ENV);
 
 // Database setup
 // Later, abstract the params into config vars for security
-var sequelize = new Sequelize('colori', 'timrourke-wdi', '', {
+var postgresUsername = config.db[process.env.NODE_ENV].username;
+var postgresPassword = config.db[process.env.NODE_ENV].password;
+
+var sequelize = new Sequelize('colori', postgresUsername, postgresPassword, {
   host: 'localhost',
   dialect: 'postgres',
 
