@@ -34,7 +34,7 @@ var upsert = function (arr, key, newval) {
 
 angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angularMoment', 'ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppUsers', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
 	.constant('urls', {
-	  BASE: 'http://localhost:8080/api'
+	  BASE: '/api'
 	})
 	.factory('TokenExpiredMessage', ['$mdDialog', function($mdDialog){
 

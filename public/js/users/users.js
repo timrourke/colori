@@ -57,8 +57,23 @@ angular.module('coloriAppUsers', [])
 .controller('UserController', ['$rootScope', '$scope', 'Users', 'Auth', 'gradientService', '$stateParams', '$timeout', 'Upload', 'urls', 
   function($rootScope, $scope, Users, Auth, gradientService, $stateParams, $timeout, Upload, urls) {
 
+  function getUserTotalStats(gradients){
+    console.log(gradients);
+    var hearts = 0;
+    var views = 0;
+    for (var i = 0; i < gradients.length; i++){
+      hearts += gradients[i].Hearts.length;
+      views += gradients[i].views;
+    }
+    $scope.user.totalhearts = hearts;
+    $scope.user.totalviews = views;
+  }  
+
   $scope.user = [];
   $scope.comments = [];
+
+  $scope.totalhearts = 0;
+  $scope.totalviews = 0;
 
   $scope.showProfile = true;
   $scope.showSocial = false;
@@ -79,10 +94,8 @@ angular.module('coloriAppUsers', [])
   }
 
   $scope.commentOnUser = function(newComment) {
-    console.log(newComment);
     Users.commentOnUser($stateParams.username, newComment,
       function(res){
-        console.log(res);
         $scope.user = res.commentedUser;
         $scope.comments = res.commentedUser.UserProfile.Comments;
         $scope.newComment = {
@@ -99,7 +112,6 @@ angular.module('coloriAppUsers', [])
       function(res) {
         $scope.user = res.foundUser;
         $scope.comments = res.foundUser.UserProfile.Comments;
-        console.log(res); 
         if ($scope.user.id == Auth.getUser().id) {
           return $scope.showForm = true;
         } else {
@@ -113,6 +125,7 @@ angular.module('coloriAppUsers', [])
       $stateParams.username,
       function(res){
         $scope.gradientItems = res.gradientsFound;
+        getUserTotalStats(res.gradientsFound);
       }, function(err){
         console.log(err);
       });

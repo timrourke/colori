@@ -489,7 +489,7 @@ angular.module('colorpicker.module', [])
               var leftValue = positionOffset.left + 68 - (elem[0].offsetWidth / 2)
             }
             positionValue = {
-              'top': positionOffset.top - (elem[0].offsetHeight * 2),
+              'top': positionOffset.top - (elem[0].offsetHeight * 3) - 18,
               'left': leftValue
             };
           }
