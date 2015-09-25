@@ -5,9 +5,6 @@ var mandrill_client = new mandrill.Mandrill(MANDRILL_API_KEY.mandrill_api_key);
 
 module.exports.confirmEmail = function(user, callback){
 
-	console.log(user);
-	console.log('verification: ' + user.email_verification_uuid);
-
 	var template_name = "colori-email-confirmation-message";
 	var template_content = [{
 	    }];

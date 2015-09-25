@@ -75,15 +75,15 @@ module.exports = function (Models) {
 
   };
 
-  var signup = function(req, res, next) {
+  var signup = function(req, res, next, callback) {
 
     var newUser = {
-        username: req.body.username,
-        password: req.body.password,
-        confirmpassword: req.body.confirmpassword,
-        email: req.body.email,
-        email_verification_uuid: uuid.v4(),
-        is_admin: false
+      username: req.body.username,
+      password: req.body.password,
+      confirmpassword: req.body.confirmpassword,
+      email: req.body.email,
+      email_verification_uuid: uuid.v4(),
+      is_admin: false
     }
     
     if (_.isEmpty(newUser.username)) {
@@ -109,7 +109,7 @@ module.exports = function (Models) {
       }).then(function(user) {
 
         if (user) {
-            res.status(400).json({ success:false, message: 'Sorry, signup failed. The username you selected has been taken. Please try another username.' });
+          return res.status(400).json({ success:false, message: 'Sorry, signup failed. The username you selected has been taken. Please try another username.' });
         } else if (!user || user.length == 0) {
 
           User.create(newUser).then(function(user) {
@@ -121,7 +121,9 @@ module.exports = function (Models) {
               userUtils.createUserProfile(Models, user, req, res, function(err, newUserProfile){
                 if (err) return next(err);
 
-                next(null, user);
+                console.log('returned control flow to signup router function.');
+
+                callback(null, user);
               });
             });
 
@@ -168,16 +170,21 @@ module.exports = function (Models) {
 
   var router = new Router();
 
-  router.route("/signup").post(signup, function (err, user, req, res, next) {
-    if (err) throw err;
+  router.route("/signup").post(function(req, res, next) {
+    signup(req, res, next, function (err, user) {
+      if (err) {
+        console.log(err);
+        return next(err);
+      };
 
-    console.log('completed signup');
+      console.log('completed signup');
 
-    return res.status(200).json({
-      user: user.username,
-      message: 'Welcome, ' + user.username + '! Your account was created. Please check your email for a confirmation message to activate your account.'
-    });  
+      return res.status(200).json({
+        user: user.username,
+        message: 'Welcome, ' + user.username + '! Your account was created. Please check your email for a confirmation message to activate your account.'
+      });  
 
+    });
   });
 
   router.route("/verify").get(function (req, res, next) {

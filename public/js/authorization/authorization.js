@@ -5,6 +5,7 @@ angular.module('coloriAppAuthorization', [])
 	  return {
 	    signup: function (data, success, error) {
 	      $http.post(urls.BASE + '/auth/signup', data).then(function(res){
+          console.log(res);
 	        success(res.data);
 	      }, function(err) {
 	        error(err.data);
