@@ -135,7 +135,19 @@ angular.module('coloriAppUsers', [])
 
   
 
-}]).controller('ConfirmEmailController', ['$scope', '$stateParams', '$location', 'Users',  function($scope, $stateParams, $location, Users){
+}])
+.factory('ConfirmEmailFailure', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+      var alert = $mdDialog.alert()
+        .title('Email address not verified.')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+    }
+
+}])
+.controller('ConfirmEmailController', ['$scope', '$stateParams', '$location', 'Users', 'ConfirmEmailFailure', function($scope, $stateParams, $location, Users, ConfirmEmailFailure){
 
   $scope.init = function() {
     if (!$stateParams.email_verification_uuid) {
@@ -146,8 +158,10 @@ angular.module('coloriAppUsers', [])
           console.log(res);
           $location.path('/login');
         }, function(err){
-          console.log(err);
-          $location.path('/');
+           ConfirmEmailFailure(err.message).then(function(){
+            console.error(err);
+            $location.path('/');
+           });
         });
     }
   }

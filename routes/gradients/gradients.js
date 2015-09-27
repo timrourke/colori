@@ -185,45 +185,45 @@ module.exports = function (Models) {
     });
   });
 
-router.route('/by/:username').get(function(req, res, next) {
-  User.findOne({
-    where: { username: req.params.username }, 
-    include: [
-      { 
-        model: Gradient,
-          include: [{
-            model: User,
-              include: [{ model: UserProfile }]
-          },{ 
-            model: Comment, 
-              include: [
-                { model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
-                  include: [{ model: UserProfile }] 
-                },{
-                  model: Heart
-                }] 
-          },{
-            model: Heart
-          }]
-      }] 
-    }).then(function(user) {
-    
-    if (user.length == 0) {
-      res.status(404).json({ success: false, message: 'No gradients by ' + req.params.username + ' found.' });
-    } else {
-      console.log(user);
-      res.status(200).json({
-        success: true,
-        message: (user.Gradients.length > 1) ? user.Gradients.length + ' gradients found by ' + req.params.username + '.' : '1 gradient found by ' + req.params.username + '.',
-        gradientsFound: user.Gradients
-      }); 
-    }
-    
-  }).catch(function(err){
-    console.log(err);
-    return next(err);
+  router.route('/by/:username').get(function(req, res, next) {
+    User.findOne({
+      where: { username: req.params.username }, 
+      include: [
+        { 
+          model: Gradient,
+            include: [{
+              model: User,
+                include: [{ model: UserProfile }]
+            },{ 
+              model: Comment, 
+                include: [
+                  { model: User, attributes: ['id', 'username', 'email', 'is_admin', 'createdAt', 'updatedAt'],
+                    include: [{ model: UserProfile }] 
+                  },{
+                    model: Heart
+                  }] 
+            },{
+              model: Heart
+            }]
+        }] 
+      }).then(function(user) {
+      
+      if (user.length == 0) {
+        res.status(404).json({ success: false, message: 'No gradients by ' + req.params.username + ' found.' });
+      } else {
+        console.log(user);
+        res.status(200).json({
+          success: true,
+          message: (user.Gradients.length > 1) ? user.Gradients.length + ' gradients found by ' + req.params.username + '.' : '1 gradient found by ' + req.params.username + '.',
+          gradientsFound: user.Gradients
+        }); 
+      }
+      
+    }).catch(function(err){
+      console.log(err);
+      return next(err);
+    });
   });
-});
 
   router.route('/:permalink/comment').post(tokenUtils.middleware(), function(req, res, next) {
     Gradient.findOne({ where: { permalink: req.params.permalink }, 
@@ -336,7 +336,7 @@ router.route('/by/:username').get(function(req, res, next) {
     });  
   }
 
-  router.route('/').post(tokenUtils.middleware(), function(req, res, next) {
+  var saveAnonymousGradient = function(req, res, next) {
 
     var gradientObject = req.body;
 
@@ -389,6 +389,78 @@ router.route('/by/:username').get(function(req, res, next) {
       });
 
     });
+
+  };
+
+  router.route('/').post(function (req, res, next) {
+      var token = tokenUtils.fetch(req.headers);
+
+      tokenUtils.retrieve(token, function (err, data) {
+
+        if (err) {
+          req.user = undefined;
+          return next(new UnauthorizedAccessError("invalid_token", data));
+        } else {
+          req.user = data;
+
+          next();
+        }
+
+      });
+    }, 
+    function(req, res, next) {
+
+      var gradientObject = req.body;
+
+      assignGradientPermalink(function(err, srs){
+        if (err) return next(err);
+
+        gradientObject.permalink = srs; 
+
+        gradientUtils.autoprefixCss(gradientObject.body, function(err, autoprefixedCss){
+          gradientObject.body_autoprefixed = autoprefixedCss;
+
+          User.findOne({ where: { id: req.user.id } }).then(function(author){
+
+            if (!author){
+
+              return next(new UnauthorizedAccessError("invalid_token", {
+                success: false,
+                message: 'You must be logged in to save a new gradient.'
+              }));
+
+            } else {
+
+              Gradient.create(gradientObject).then(function(gradient){
+
+                gradient.setUser(author).then(function(authoredGradient){
+
+                  res.status(200).json({
+                    success: true,
+                    message: 'Gradient created.',
+                    gradientCreated: authoredGradient
+                  }); 
+                  
+                }).catch(function(err){
+                  console.log(err);
+                  return next(err);
+                });
+
+              }).catch(function(err){
+                console.log(err);
+                return next(err);
+              });
+
+            } // end if/else block checking for author
+
+          }).catch(function(err){
+            console.log(err);
+            return next(err);
+          });
+
+        });
+
+      });
 
   });
 

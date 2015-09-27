@@ -114,6 +114,7 @@ module.exports = function(sequelize, Sequelize) {
 			} 
 		},
 		color_stops: 							{ type: Sequelize.JSON, allowNull: false },
+		angle: 										{ type: Sequelize.FLOAT, defaultValue: 0 },
 		views: 										{ type: Sequelize.INTEGER, defaultValue: 0 }
 	},{
 		hooks: {

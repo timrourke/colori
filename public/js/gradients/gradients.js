@@ -5,7 +5,6 @@ angular.module('coloriAppGradients', [])
 			getGradients: function(success, error){
 				$http.get(urls.BASE + '/gradients').then(function(res){
 					success(res.data);
-					console.log(res.data);
 				}, function(err){
 					error(err.data);
 				});
@@ -24,7 +23,6 @@ angular.module('coloriAppGradients', [])
 				} else {
 					$http.get(urls.BASE + '/gradients/' + permalink).then(function(res){
 						gradientCache[permalink] = res.data;
-						console.log(res.data);
 						success(res.data);
 					}, function(err) {
 						error(err.data);
@@ -57,6 +55,7 @@ angular.module('coloriAppGradients', [])
 	.service('colorStopRegister', [function() {
 		var pickerCount = 0;
 		var colorStops = [];
+		var angle = 0;
 		return {
 			increasePickerCount: function() {
 				pickerCount++;
@@ -107,6 +106,12 @@ angular.module('coloriAppGradients', [])
 					result.push(colorStops[key])
 				}
 				return result;
+			},
+			getAngle: function() {
+				return angle;
+			},
+			setAngle: function(newAngle) {
+				angle = newAngle;
 			}
 		};
 		
@@ -162,7 +167,7 @@ angular.module('coloriAppGradients', [])
 			templateUrl: '/partials/directives/css-gradient-string.html',
 			link: function(scope, element, attributes) {
 				scope.closeCss = function() {
-					console.log('hi');
+
 					scope.showcss = false;
 				}
 			}
@@ -198,6 +203,15 @@ angular.module('coloriAppGradients', [])
 
 		$scope.gradient = {};
 
+		$scope.dialAngle = colorStopRegister.getAngle();
+
+		$scope.$watch(function(scope){
+			return colorStopRegister.getAngle();
+		}, function(newValue, oldValue){
+			colorStopRegister.setAngle(newValue);
+			$scope.dialAngle = colorStopRegister.getAngle();
+		});
+
 		$scope.init = function() {
 			// If browsing to a predefined gradient, display it on screen
 			if (typeof $stateParams.permalink != 'undefined') {
@@ -209,8 +223,13 @@ angular.module('coloriAppGradients', [])
 
 						flattenCommentsObject(res.gradientFound.Comments);						
 
-						addExistingColorPickers(res.gradientFound.color_stops);
+						addExistingColorPickers(res.gradientFound.color_stops, res.gradientFound.angle);
+
 						$scope.colorStops = colorStopRegister.getColorStops();
+
+						colorStopRegister.setAngle(res.gradientFound.angle);
+
+						$scope.dialAngle = res.gradientFound.angle;
 					}, function(err){
 						console.log(err);
 					});
@@ -234,7 +253,6 @@ angular.module('coloriAppGradients', [])
 		};
 
 		$scope.closeCss = function() {
-			console.log('hi');
 			$scope.showCss = false;
 		};
 
@@ -301,7 +319,7 @@ angular.module('coloriAppGradients', [])
 			//build a css string for our inline style block.
 			if (colorStops.length > 1) {
 				var counter = 0;
-				result += 'linear-gradient(\n\t   to right,';
+				result += 'linear-gradient(\n\t   ' + $scope.dialAngle + 'deg,';
 				for(var i = 0; i < colorStops.length; i++) {
 					result += '\n\t   ' + colorStops[i].color + ' ' + parseFloat(colorStops[i].left).toPrecision(5) + '%';
 					if (i + 1 !== colorStops.length) {
@@ -346,10 +364,11 @@ angular.module('coloriAppGradients', [])
 
 		$scope.saveGradient = function(){
 			var newGradient = {
-				title: 'New Gradient',
+				title: 'Untitled Gradient',
 				body: getGradientCssString(),
 				description: 'This is a test gradient.',
-				color_stops: sortColorStopsByPositionLeft(colorStopRegister.getColorStops())
+				color_stops: sortColorStopsByPositionLeft(colorStopRegister.getColorStops()),
+				angle: $scope.dialAngle
 			}
 			gradientService.createGradient(newGradient,
 				function(res){
@@ -376,7 +395,7 @@ angular.module('coloriAppGradients', [])
 			colorStopRegister.pushColorStop(el);
 		};
 
-		addExistingColorPickers = function(colorPickers) {
+		addExistingColorPickers = function(colorPickers, angle) {
 			if (colorStopRegister.getPickerCount() == colorPickers.length) {
 				return;
 			}
@@ -396,6 +415,8 @@ angular.module('coloriAppGradients', [])
 				$scope.colorStops = colorStopRegister.getRawColorStops();
 				angular.element(elDest).append($compile(colorPickersElement)($scope));
 				colorStopRegister.setPickerCount(colorPickers.length);
+				colorStopRegister.setAngle(angle);
+				$scope.dialAngle = angle;
 			}
 		};
 
@@ -456,4 +477,67 @@ angular.module('coloriAppGradients', [])
 			};
 		}
 	}
+}])
+.directive('dial', ['$document', '$window', '$timeout', function($document, $window, $timeout) {
+  return {
+    restrict: 'E',
+    scope: {
+      angle: '='
+    },
+    link: function(scope, element, attrs) {
+      var startAngle = scope.angle,
+          w = 200,
+          h = 200,
+          x = (parseInt($window.innerWidth) / 2) - (w / 2), 
+          y = (parseInt($window.innerHeight) / 2) - (h / 2);
+
+      element.css({
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translateX(-50%) translateY(-50%) rotateZ(' + startAngle + 'deg)',
+        borderRadius: '50%',
+        cursor: 'pointer',
+        display: 'block',
+        width: w + 'px',
+        height: h + 'px'
+      });
+
+      scope.$watch('angle', function(newValue, oldValue){
+        updateAngle(newValue - startAngle);
+      });
+
+      element.on('mousedown', function(event) {
+        // Prevent default dragging of selected content
+        event.preventDefault();
+        $document.on('mousemove', mousemove);
+        $document.on('mouseup', mouseup);
+      });
+
+      function mousemove(event) {
+        y = event.clientY;
+        x = event.clientX;
+        ctrX = $window.innerWidth / 2;
+        ctrY = $window.innerHeight / 2;
+        angle = Math.atan2(-(ctrY - y), -(ctrX - x)) * 180 / Math.PI + 180;
+
+        scope.$apply(function(){
+          scope.angle = angle + startAngle - 180;
+        });
+        
+        updateAngle(angle);
+      }
+
+      function mouseup() {
+        $document.off('mousemove', mousemove);
+        $document.off('mouseup', mouseup);
+      }
+
+      function updateAngle(angle) {        
+        element.css({
+          transform: 'translateX(-50%) translateY(-50%) rotateZ(' + (angle - 180 + startAngle) + 'deg)'
+        });
+      }
+    }
+  }
 }])

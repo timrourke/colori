@@ -37,7 +37,7 @@ css-gradient-string {
 	max-width:20em;
 	border-radius:10px/10px;
 	box-shadow: 0 3px 7px rgba(0,0,0,0.125);
-	overflow-y:scroll;
+	overflow-y:hidden;
 	@media all and (max-width: 800px) {
 		left:5%;
 		width:90%;
@@ -75,12 +75,12 @@ css-gradient-string.gradient-string--open {
 		md-tab-item,
 		md-content,
 		md-tabs-canvas {
-			overflow-y:scroll !important;
-			overflow-x:hidden;
+			// overflow-y:scroll !important;
+			// overflow-x:hidden;
 		}
 		.gradientString md-tab-content.md-no-scroll {
-			overflow-y:scroll !important;
-			overflow-x:hidden;
+			// overflow-y:scroll !important;
+			// overflow-x:hidden;
 		}
 		.gradientString {
 			//transform:translateX()
@@ -124,4 +124,41 @@ md-tabs {  // Based on earlier post, required to allow scrolling internal tab co
 
 .gradient-string-toggle.gradient-string--open svg {
 	fill:#00FC6B;
+}
+
+dial {
+	border: 10px solid #ccc;
+}
+
+dial::before {
+	content:'';
+	display:block;
+	position:absolute;
+	top:85px;
+	left:-9px;
+	width:10px;
+	height:8px;
+	background-color:red;
+}
+
+dial::after {
+	content:'';
+	display:block;
+	position:absolute;
+	top:85px;
+	right:-9px;
+	width:10px;
+	height:8px;
+	background-color:red;
+}
+
+.dialIndicator {
+	position: absolute;
+	top:50%;
+	left:50%;
+	transform:translateX(-50%) translateY(-50%);
+	z-index:10;
+	width:170px;
+	font-size:2em;
+	text-align:center;
 }
