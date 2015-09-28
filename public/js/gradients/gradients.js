@@ -431,6 +431,7 @@ angular.module('coloriAppGradients', [])
 
 		$scope.init = function() {
 			gradientService.getGradients(function(res){
+				console.log(res.gradientsFound);
 				$scope.gradientItems = res.gradientsFound;
 			}, function(err){
 				console.log(err);

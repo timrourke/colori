@@ -11,9 +11,10 @@
   					Sort by:
   					<div class="gradients-grid__nav-select select">
 						  <select ng-model="sortOrder">
-						    <option value="-posted" selected>most recent.</option>
-						    <option value="-hearts">most popular.</option>
-						    <option value="comments">comments.</option>
+						    <option value="-views" selected>most views.</option>
+                <option value="-posted" selected>most recent.</option>
+						    <option value="-Hearts">most popular.</option>
+						    <option value="-Comments">comments.</option>
 						  </select>
 						</div>
   				</label>
@@ -31,7 +32,7 @@
           gradienttitle="gradientItem.title" 
           authoravatar="gradientItem.User.UserProfile.avatar_url"
           allgradients="gradientItems"
-          ng-repeat="gradientItem in gradientItems | orderBy: 'sortOrder'"></gradient-item>
+          ng-repeat="gradientItem in gradientItems | orderBy: sortOrder"></gradient-item>
   	</div>
   </div>
 </section>
