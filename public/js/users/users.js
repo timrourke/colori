@@ -69,7 +69,7 @@ angular.module('coloriAppUsers', [])
     $scope.user.totalviews = views;
   }  
 
-  $scope.sortOrder = '-posted | dateGetTime';
+  $scope.sortOrder = 'createdAt | dateGetTime | number';
 
   $scope.user = [];
   $scope.comments = [];

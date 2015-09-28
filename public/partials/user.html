@@ -100,7 +100,7 @@
               Sort by:
               <div class="gradients-grid__nav-select select">
                 <select ng-model="sortOrder">
-                  <option value="-posted | dateGetTime" selected>most recent.</option>
+                  <option value="createdAt | dateGetTime | number" selected>most recent.</option>
                   <option value="-views" selected>most views.</option>
                   <option value="-Hearts">most popular.</option>
                   <option value="-Comments">comments.</option>
@@ -122,7 +122,7 @@
           posted="gradientItem.createdAt" 
           title="gradientItem.title" 
           authoravatar="gradientItem.User.UserProfile.avatar_url"
-          ng-repeat="gradientItem in gradientItems | orderBy: sortOrder"></gradient-item>
+          ng-repeat="gradientItem in gradientItems | orderBy: (sortOrder)"></gradient-item>
       </div>  
     </div>
   </section>

@@ -147,7 +147,7 @@ angular.module('coloriAppGradients', [])
 	  return function(input) {
 	    var date = new Date(input);
 
-	    return date.getTime();
+	    return date.getTime().toString();
 	  };
 	})
 	.factory('CommentSaveFailed', ['$mdDialog', function($mdDialog){
@@ -445,7 +445,7 @@ angular.module('coloriAppGradients', [])
 			});
 		};
 
-		$scope.sortOrder = '-posted | dateGetTime';
+		$scope.sortOrder = "createdAt | dateGetTime | number";
 		
 		$scope.init();
 
