@@ -445,7 +445,7 @@ angular.module('coloriAppGradients', [])
 			});
 		};
 
-		$scope.sortOrder = "createdAt | dateGetTime | number";
+		$scope.sortOrder = "-createdAt | dateGetTime | number";
 		
 		$scope.init();
 
