@@ -30,6 +30,7 @@
     "response-time": "^2.3.1",
     "secure-random-string": "^1.0.0",
     "sequelize": "^3.7.1",
+    "sequelize-cli": "^1.9.1",
     "serve-favicon": "~2.2.0",
     "util": "^0.10.3",
     "uuid": "^2.0.1"

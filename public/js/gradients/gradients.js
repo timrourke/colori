@@ -385,6 +385,7 @@ angular.module('coloriAppGradients', [])
 		}
 
 		$scope.addColorPicker = function() {
+			colorStopRegister.setAngle($scope.dialAngle);
 			var gradCount = colorStopRegister.getPickerCount();
 			var el = $compile('<div class="colorpicker__wrapper" draggable gradient-id="' + gradCount + '"><button class="colorpicker__button" style="border:3px solid {{colorStops.colorStop' + gradCount + '.color}};" colorpicker="rgba" colorpicker-position="custom" colorpicker-with-input="true" ng-model="colorStops.colorStop' + gradCount + '.color"><div class="colorpicker__button-position-arrow" style="border-top:10px solid {{colorStops.colorStop' + gradCount + '.color}};"></div></button></div>')($scope);
 			var elDest = document.querySelector('.gradient-wrapper');
@@ -393,6 +394,8 @@ angular.module('coloriAppGradients', [])
 				left: ((window.innerWidth/2) - (el[0].clientWidth/2)).toPrecision(7) + 'px'
 			});					
 			colorStopRegister.pushColorStop(el);
+			$scope.dialAngle = colorStopRegister.getAngle();
+			console.log($scope.dialAngle);
 		};
 
 		addExistingColorPickers = function(colorPickers, angle) {
