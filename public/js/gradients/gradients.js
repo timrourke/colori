@@ -143,6 +143,13 @@ angular.module('coloriAppGradients', [])
 	    return out;
 	  };
 	})
+	.filter('dateGetTime', function() {
+	  return function(input) {
+	    var date = new Date(input);
+
+	    return date.getTime();
+	  };
+	})
 	.factory('CommentSaveFailed', ['$mdDialog', function($mdDialog){
 
     return function(message) {
@@ -438,7 +445,7 @@ angular.module('coloriAppGradients', [])
 			});
 		};
 
-		$scope.sortOrder = '';
+		$scope.sortOrder = '-posted | dateGetTime';
 		
 		$scope.init();
 

@@ -11,8 +11,8 @@
   					Sort by:
   					<div class="gradients-grid__nav-select select">
 						  <select ng-model="sortOrder">
+                <option value="-posted | dateGetTime" selected>most recent.</option>
 						    <option value="-views" selected>most views.</option>
-                <option value="-posted" selected>most recent.</option>
 						    <option value="-Hearts">most popular.</option>
 						    <option value="-Comments">comments.</option>
 						  </select>
@@ -26,9 +26,10 @@
           author="gradientItem.User.username" 
           views="gradientItem.views" 
           hearts="gradientItem.Hearts.length" 
-          comments="gradientItem.Comments.length" 
+          comments="gradientItem.Comments.length"
           gradient="gradientItem.body_autoprefixed" 
-          permalink="gradientItem.permalink" posted="gradientItem.createdAt" 
+          permalink="gradientItem.permalink" 
+          posted="gradientItem.createdAt" 
           gradienttitle="gradientItem.title" 
           authoravatar="gradientItem.User.UserProfile.avatar_url"
           allgradients="gradientItems"
