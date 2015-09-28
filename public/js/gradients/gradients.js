@@ -395,7 +395,6 @@ angular.module('coloriAppGradients', [])
 			});					
 			colorStopRegister.pushColorStop(el);
 			$scope.dialAngle = colorStopRegister.getAngle();
-			console.log($scope.dialAngle);
 		};
 
 		addExistingColorPickers = function(colorPickers, angle) {
