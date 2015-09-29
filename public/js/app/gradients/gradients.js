@@ -370,6 +370,7 @@ angular.module('coloriAppGradients', [])
 		};
 
 		$scope.saveGradient = function(){
+			console.log('click');
 			var newGradient = {
 				title: 'Untitled Gradient',
 				body: getGradientCssString(),

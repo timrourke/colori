@@ -336,77 +336,29 @@ module.exports = function (Models) {
     });  
   }
 
-  var saveAnonymousGradient = function(req, res, next) {
-
-    var gradientObject = req.body;
-
-    assignGradientPermalink(function(err, srs){
-      if (err) return next(err);
-
-      gradientObject.permalink = srs; 
-
-      gradientUtils.autoprefixCss(gradientObject.body, function(err, autoprefixedCss){
-        gradientObject.body_autoprefixed = autoprefixedCss;
-
-        User.findOne({ where: { id: req.user.id } }).then(function(author){
-
-          if (!author){
-
-            return next(new UnauthorizedAccessError("invalid_token", {
-              success: false,
-              message: 'You must be logged in to save a new gradient.'
-            }));
-
-          } else {
-
-            Gradient.create(gradientObject).then(function(gradient){
-
-              gradient.setUser(author).then(function(authoredGradient){
-
-                res.status(200).json({
-                  success: true,
-                  message: 'Gradient created.',
-                  gradientCreated: authoredGradient
-                }); 
-                
-              }).catch(function(err){
-                console.log(err);
-                return next(err);
-              });
-
-            }).catch(function(err){
-              console.log(err);
-              return next(err);
-            });
-
-          } // end if/else block checking for author
-
-        }).catch(function(err){
-          console.log(err);
-          return next(err);
-        });
-
-      });
-
-    });
-
-  };
-
   router.route('/').post(function (req, res, next) {
       var token = tokenUtils.fetch(req.headers);
 
-      tokenUtils.retrieve(token, function (err, data) {
+      if (token) {
+        tokenUtils.retrieve(token, function (err, data) {
 
-        if (err) {
-          req.user = undefined;
-          return next(new UnauthorizedAccessError("invalid_token", data));
-        } else {
-          req.user = data;
+          if (err) {
+            req.user = undefined;
+            return next(new UnauthorizedAccessError("invalid_token", data));
+          } else {
+            req.user = data;
 
-          next();
-        }
+            next();
+          }
 
-      });
+        });  
+      } else {
+        //If no token is present, assign req.user to 'anonymous' for query assignment below
+        req.user = 'anonymous';
+
+        next();
+      }
+      
     }, 
     function(req, res, next) {
 
@@ -420,7 +372,16 @@ module.exports = function (Models) {
         gradientUtils.autoprefixCss(gradientObject.body, function(err, autoprefixedCss){
           gradientObject.body_autoprefixed = autoprefixedCss;
 
-          User.findOne({ where: { id: req.user.id } }).then(function(author){
+          //Dynamically assign user query depending upon whether a user is currently logged in
+          var userQuery;
+
+          if (req.user && req.user !== 'anonymous') {
+            userQuery = { id: req.user.id };
+          } else if (req.user === 'anonymous' || !req.user) {
+            userQuery = { username: 'Anonymous' };
+          }
+
+          User.findOne({ where: userQuery }).then(function(author){
 
             if (!author){
 

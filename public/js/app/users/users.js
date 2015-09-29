@@ -138,6 +138,17 @@ angular.module('coloriAppUsers', [])
   
 
 }])
+.factory('ConfirmEmailSuccess', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+      var alert = $mdDialog.alert()
+        .title('Account verified.')
+        .content(message)
+        .ok('Close');
+        return $mdDialog.show(alert);
+    }
+
+}])
 .factory('ConfirmEmailFailure', ['$mdDialog', function($mdDialog){
 
     return function(message) {
@@ -157,8 +168,10 @@ angular.module('coloriAppUsers', [])
     } else if ($stateParams.email_verification_uuid != '') {
       Users.confirmEmailVerificationUUID($stateParams.email_verification_uuid,
         function(res){
-          console.log(res);
-          $location.path('/login');
+          ConfirmEmailSuccess(res.message).then(function(){
+            console.info(res.message);
+            $location.path('/login');  
+          });
         }, function(err){
            ConfirmEmailFailure(err.message).then(function(){
             console.error(err);

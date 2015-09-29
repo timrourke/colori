@@ -4,6 +4,7 @@ var sourcemaps =      require('gulp-sourcemaps');
 var minifyCSS =       require('gulp-minify-css');
 var mainBowerFiles =  require('main-bower-files');
 var uglify =          require('gulp-uglify');
+var ngAnnotate =      require('gulp-ng-annotate');
 var concat =          require('gulp-concat');
 var notify =          require('gulp-notify');
 var autoprefixer =    require('gulp-autoprefixer');
@@ -62,10 +63,11 @@ gulp.task('sass-ie', function () {
 
 // javascripts
 gulp.task('js', ['bower'], function() {
-  return gulp.src(['./js/vendor/vendor.js', './js/global.js'])
+  return gulp.src(['./js/vendor/vendor.js', './js/global.js', './js/app/**/*.js'])
     .pipe(concat('./js-build/global.build.js'))
-    .pipe(jshint())
+    //.pipe(jshint())
     .pipe(rename('global.min.js'))
+    .pipe(ngAnnotate())
     .pipe(uglify())
     .pipe(gulp.dest('./js-build/'))
     .pipe(browserSync.stream());
@@ -196,11 +198,11 @@ gulp.task('serve', ['sass', 'sass-ie', 'images', 'svgstore'], function() {
   });
 
   gulp.watch('images-source/**/*.{jpg,jpeg,png,tiff,webp,gif}', ['images']);
-  //gulp.watch('./js/**/*.js', ['js'])
+  gulp.watch('./js/**/*.js', ['js'])
   gulp.watch('bower_components/**/*.js', ['bower']);
   gulp.watch('./svg-source/**/*.svg', ['svgstore']);
   gulp.watch('./scss/**', ['sass', 'sass-ie']);
   gulp.watch("**/*.html").on("change", browserSync.reload);
 });
 
-gulp.task('default', [/*'js',*/ 'bower', 'serve']);
+gulp.task('default', ['js', 'serve']);
