@@ -160,7 +160,8 @@ angular.module('coloriAppUsers', [])
     }
 
 }])
-.controller('ConfirmEmailController', ['$scope', '$stateParams', '$location', 'Users', 'ConfirmEmailFailure', function($scope, $stateParams, $location, Users, ConfirmEmailFailure){
+.controller('ConfirmEmailController', ['$scope', '$stateParams', '$location', 'Users', 'ConfirmEmailSuccess', 'ConfirmEmailFailure', 
+  function($scope, $stateParams, $location, Users, ConfirmEmailSuccess, ConfirmEmailFailure){
 
   $scope.init = function() {
     if (!$stateParams.email_verification_uuid) {
