@@ -75,6 +75,7 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
         var token = Auth.getToken();
         if (token != undefined && jwtHelper.isTokenExpired(token)) {
           $rootScope.currentUser = null;
+          Auth.deleteUser();
           Auth.deleteToken();
           ToastFactory('Your current user session has expired. Please log back in to proceed.', 4500, 'warn').then(function(){
             console.warn('Your current user session has expired. Please log back in to proceed.');

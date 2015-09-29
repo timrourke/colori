@@ -5,7 +5,6 @@ angular.module('coloriAppAuthorization', [])
 	  return {
 	    signup: function (data, success, error) {
 	      $http.post(urls.BASE + '/auth/signup', data).then(function(res){
-          console.log(res);
 	        success(res.data);
 	      }, function(err) {
 	        error(err.data);
@@ -60,6 +59,9 @@ angular.module('coloriAppAuthorization', [])
 	        return "";
 	      }
 	    },
+      deleteUser: function() {
+        delete $localStorage.user;
+      },
 	    successAuth: function(res) {
 	      $localStorage.id_token = res.user.token;
 	      $localStorage.user = res.user;
