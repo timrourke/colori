@@ -81,6 +81,14 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
             console.warn('Your current user session has expired. Please log back in to proceed.');
           });
         }
+
+        if (!token && $rootScope.currentUser) {
+          $rootScope.currentUser = null;
+          Auth.deleteUser();
+          ToastFactory('Your current user session has expired. Please log back in to proceed.', 4500, 'warn').then(function(){
+            console.warn('Your current user session has expired. Please log back in to proceed.');
+          });
+        }
       }
     }
   }])

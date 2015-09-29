@@ -160,37 +160,6 @@ module.exports = function(sequelize, Sequelize) {
 	Comment.hasMany(Heart);
 	Heart.belongsTo(User);
 
-	/*
-	 * Use the pattern defined below to create associations.
-	 *
-	 */
-
-
-	// User.create({
-	// 	username: 'Tim',
-	// 	email: 'tim@timrourke.com',
-	// 	password: 'password'
-	// }).then(function(user){
-
-	// 	UserProfile.create({
-
-	// 	}).then(function(profile){
-			
-	// 		user.setUserProfile(profile).then(function(){
-	// 			console.log('success!');
-	// 		}).catch(function(err){
-	// 			throw err;
-	// 		});
-
-	// 	}).catch(function(err){
-	// 		throw err;
-	// 	});
-		
-	// }).catch(function(err){
-	// 	throw err;
-	// });
-
-
 	var Models =  {
 		User: User,
 		UserProfile: UserProfile,
