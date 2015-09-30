@@ -189,21 +189,21 @@ angular.module('coloriApp',
         }
 
         //Upon leaving the editor or a previously saved gradient, check to see what if any changes have been made to the current gradient
-        if ((fromState.url == '/gradients/:permalink' || fromState.url == '/editor') && ($rootScope.abandoningChanges == false || typeof $rootScope.abandoningChanges == 'undefined')) {
+        if ((fromState.url == '/gradients/:permalink' || fromState.url == '/editor') && ($rootScope.skipAbandonSaveCheck == false || typeof $rootScope.skipAbandonSaveCheck == 'undefined')) {
  
           if (colorStopRegister.compareColorStops() == false) {
             event.preventDefault();
-            ConfirmAbandonUnsavedGradient('Your gradient has unsaved changes! Leaving this page will abandon any changes you have made.')
+            ConfirmAbandonUnsavedGradient('Your gradient has unsaved changes. Leaving this page will abandon any changes you have made.')
             .then(function(){
-              $rootScope.abandoningChanges = true;
+              $rootScope.skipAbandonSaveCheck = true;
               $state.go(toState.name);
             })
             .catch(function(){
-              $rootScope.abandoningChanges = false;  
+              $rootScope.skipAbandonSaveCheck = false;  
             })
             .finally(function(){
-              $rootScope.abandoningChanges = false;
-            })
+              $rootScope.skipAbandonSaveCheck = false;
+            });
             
           }
         }

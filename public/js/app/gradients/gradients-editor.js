@@ -1,6 +1,6 @@
 angular.module('coloriAppGradientEditor', [])
-.controller('gradientController', ['$scope', '$compile', '$location', 'colorStopRegister', 'gradientService', '$stateParams', 'GradientSaveFailed', 'ToastFactory', 
-		function($scope, $compile, $location, colorStopRegister, gradientService, $stateParams, GradientSaveFailed, ToastFactory) {
+.controller('gradientController', ['$rootScope', '$scope', '$compile', '$location', 'colorStopRegister', 'gradientService', '$stateParams', 'GradientSaveFailed', 'ToastFactory', 
+		function($rootScope, $scope, $compile, $location, colorStopRegister, gradientService, $stateParams, GradientSaveFailed, ToastFactory) {
 
 		/**
 		 * Gradient utility functions
@@ -232,9 +232,13 @@ angular.module('coloriAppGradientEditor', [])
 			gradientService.createGradient(newGradient,
 				function(res){
 					console.log(res);
+					$rootScope.skipAbandonSaveCheck = true;
 					$location.path('/gradients/' + res.gradientCreated.permalink);
 					ToastFactory('Gradient successfully saved.', 3000, 'success').then(function(){
+            
             console.info('Gradient successfully saved.');
+          }).finally(function(){
+						$rootScope.skipAbandonSaveCheck = false;          	
           }); 
 				}, function(err){
 					GradientSaveFailed(err.message).then(function(){
