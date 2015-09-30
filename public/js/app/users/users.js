@@ -135,8 +135,6 @@ angular.module('coloriAppUsers', [])
 
   $scope.init();
 
-  
-
 }])
 .factory('ConfirmEmailSuccess', ['$mdDialog', function($mdDialog){
 

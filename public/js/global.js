@@ -52,7 +52,24 @@ DOMReady(function () {
  *
  */
 
-angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angularMoment', 'ngStorage', 'ui.router', 'angular-jwt', 'colorpicker.module', 'draggableModule', 'coloriAppAuthorization', 'coloriAppUsers', 'coloriAppGradients', 'coloriAppAnimator', 'coloriAppComments'])
+angular.module('coloriApp',
+  //Define Angular application dependencies
+  [ 'ngFileUpload', 
+    'ngAnimate', 
+    'ngMaterial', 
+    'angularMoment', 
+    'ngStorage', 
+    'ui.router', 
+    'angular-jwt', 
+    'colorpicker.module', 
+    'draggableModule', 
+    'coloriAppAuthorization', 
+    'coloriAppUsers', 
+    'coloriAppGradients',
+    'coloriAppGradientEditor', 
+    'coloriAppAnimator', 
+    'coloriAppComments'
+    ])
   .constant('urls', {
     BASE: '/api'
   })
@@ -147,15 +164,48 @@ angular.module('coloriApp', ['ngFileUpload', 'ngAnimate', 'ngMaterial', 'angular
     $locationProvider.html5Mode(true);
 
   }])
-  .run(['$rootScope', 'colorStopRegister', 'tokenExpirationFactory', 
-    function($rootScope, colorStopRegister, tokenExpirationFactory){
+  .factory('ConfirmAbandonUnsavedGradient', ['$mdDialog', function($mdDialog){
+
+    return function(message) {
+      var confirm = $mdDialog.confirm()
+        .title('Unsaved gradient!')
+        .content(message)
+        .cancel('Cancel')
+        .ok('Discard Changes');
+        return $mdDialog.show(confirm);
+    }
+
+  }])
+  .run(['$rootScope', '$state', 'colorStopRegister', 'tokenExpirationFactory', 'ConfirmAbandonUnsavedGradient',
+    function($rootScope, $state, colorStopRegister, tokenExpirationFactory, ConfirmAbandonUnsavedGradient){
     $rootScope.$on('$stateChangeStart',
       function(event, toState, toParams, fromState, fromParams){
         tokenExpirationFactory.check();
         
-
+        //Upon entering the editor or a previously saved gradient, reset the current colorstops to be empty
         if (toState.url == '/gradients/:permalink' || toState.url == '/editor') {
           colorStopRegister.setColorStops([]);
+          colorStopRegister.resetOriginalColorStops();
+        }
+
+        //Upon leaving the editor or a previously saved gradient, check to see what if any changes have been made to the current gradient
+        if ((fromState.url == '/gradients/:permalink' || fromState.url == '/editor') && ($rootScope.abandoningChanges == false || typeof $rootScope.abandoningChanges == 'undefined')) {
+ 
+          if (colorStopRegister.compareColorStops() == false) {
+            event.preventDefault();
+            ConfirmAbandonUnsavedGradient('Your gradient has unsaved changes! Leaving this page will abandon any changes you have made.')
+            .then(function(){
+              $rootScope.abandoningChanges = true;
+              $state.go(toState.name);
+            })
+            .catch(function(){
+              $rootScope.abandoningChanges = false;  
+            })
+            .finally(function(){
+              $rootScope.abandoningChanges = false;
+            })
+            
+          }
         }
     });
 }])

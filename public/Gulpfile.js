@@ -65,7 +65,7 @@ gulp.task('sass-ie', function () {
 gulp.task('js', ['bower'], function() {
   return gulp.src(['./js/vendor/vendor.js', './js/global.js', './js/app/**/*.js'])
     .pipe(concat('./js-build/global.build.js'))
-    //.pipe(jshint())
+    .pipe(jshint())
     .pipe(rename('global.min.js'))
     .pipe(ngAnnotate())
     .pipe(uglify())
@@ -198,11 +198,14 @@ gulp.task('serve', ['sass', 'sass-ie', 'images', 'svgstore'], function() {
   });
 
   gulp.watch('images-source/**/*.{jpg,jpeg,png,tiff,webp,gif}', ['images']);
-  gulp.watch('./js/**/*.js', ['js'])
+  //gulp.watch('./js/**/*.js', ['js']);
+  gulp.watch('./js/**/*.js').on('change', browserSync.reload);
   gulp.watch('bower_components/**/*.js', ['bower']);
   gulp.watch('./svg-source/**/*.svg', ['svgstore']);
   gulp.watch('./scss/**', ['sass', 'sass-ie']);
-  gulp.watch("**/*.html").on("change", browserSync.reload);
+  gulp.watch('**/*.html').on('change', browserSync.reload);
 });
 
-gulp.task('default', ['js', 'serve']);
+gulp.task('default', ['bower', 'serve']);
+
+gulp.task('js-production', ['js']);
