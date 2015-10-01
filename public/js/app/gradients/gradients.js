@@ -18,6 +18,7 @@ angular.module('coloriAppGradients', [])
 				});
 			},
 			getGradient: function(permalink, success, error){
+				//Check cache for gradient before db fetch
 				if (gradientCache[permalink]) {
 					success(gradientCache[permalink]);
 				} else {

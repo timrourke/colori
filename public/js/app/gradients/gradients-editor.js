@@ -7,8 +7,8 @@ angular.module('coloriAppGradientEditor', [])
 	 *
 	 */
 
+	//Reprocess comments into flat array for sorting.
 	function flattenCommentsObject(commentsInput) {
-		//Reprocess into flat array for sorting.
 		if (Array.isArray(commentsInput)) {
 			for(var i = 0; i < commentsInput.length; i++) {
 				var commentTemp = {
@@ -32,7 +32,11 @@ angular.module('coloriAppGradientEditor', [])
 		}
 	};
 
+	//Add colorpickers to editor once data retrieved from backend.
 	addExistingColorPickers = function(colorPickers, angle) {
+		//If the colorStop register already reports containing the number of
+		//colorpickers returned from the db, return early. Helps avoid an infinite
+		//digest loop.
 		if (colorStopRegister.getPickerCount() == colorPickers.length) {
 			return;
 		}
@@ -61,43 +65,14 @@ angular.module('coloriAppGradientEditor', [])
 	//$scope.gradientType = 'linear';
 	$scope.gradientType = 'radial';
 
-	$scope.init = function() {
-		// If browsing to a predefined gradient, display it on screen
-		if (typeof $stateParams.permalink != 'undefined') {
-			gradientService.getGradient($stateParams.permalink,
-				function(res){
-					$scope.gradient = res.gradientFound;
-					
-					$scope.comments = [];
+	/*
+	 * Instantiate radial gradient scope variables
+	 *
+	 */
 
-					flattenCommentsObject(res.gradientFound.Comments);						
-
-					addExistingColorPickers(res.gradientFound.color_stops, res.gradientFound.angle);
-
-					$scope.colorStops = colorStopRegister.getColorStops();
-
-					colorStopRegister.setAngle(res.gradientFound.angle);
-
-					$scope.dialAngle = res.gradientFound.angle;
-
-					//Set original colorstops state
-					colorStopRegister.setOriginalColorStops(res.gradientFound.color_stops);
-				}, function(err){
-					console.log(err);
-				});
-		
-		} else {
-			// If not displaying a predefined a gradient, display a blank canvas
-			$scope.colorStops = colorStopRegister.getColorStops();
-			// Set record of original colorStop state to compare when a user navigates without saving 
-			colorStopRegister.setOriginalColorStops($scope.colorStops);
-
-		}
-
-	};
-
+	//Simple test to check if radial attributes haave already been populated. 
+	//Prevents clearing UI of colorpickers upon a digest loop.
 	if (!colorStopRegister.getRadialAttributes().hasOwnProperty('radialAngle')) {
-
 		var radialAttributes = {
 			radialAngle: 0,
 		  radialWidth: 200,
@@ -109,10 +84,7 @@ angular.module('coloriAppGradientEditor', [])
 		}
 
 		colorStopRegister.setRadialAttributes(radialAttributes);
-		
 	}
-
-	
 
 	$scope.radialAttributes = colorStopRegister.getRadialAttributes();
 
@@ -134,7 +106,7 @@ angular.module('coloriAppGradientEditor', [])
 
 	$scope.toggleSocialPanel = function() {
 		$scope.showSocial = !$scope.showSocial;
-	}
+	};
 
 	/*
 	 *	Comments
@@ -159,7 +131,7 @@ angular.module('coloriAppGradientEditor', [])
 					console.log(err);
 				});
 			});
-	}
+	};
 
 	/*
 	 *	ColorStop Management
@@ -273,17 +245,19 @@ angular.module('coloriAppGradientEditor', [])
 
 		gradientService.createGradient(newGradient,
 			function(res){
+				//Skip dirty save state check because a successful save will cause a redirect
+				//to a new gradient detail view for the saved item.
 				$rootScope.skipAbandonSaveCheck = true;
 				$location.path('/gradients/' + res.gradientCreated.permalink);
-				ToastFactory('Gradient successfully saved.', 3000, 'success').then(function(){
-          
+
+				ToastFactory('Gradient successfully saved.', 3000, 'success').then(function(){     
           console.info('Gradient successfully saved.');
         }).finally(function(){
 					$rootScope.skipAbandonSaveCheck = false;          	
         }); 
 			}, function(err){
 				GradientSaveFailed(err.message).then(function(){
-					console.log(err);
+					console.error(err);
 				});
 			});
 	}
@@ -302,11 +276,46 @@ angular.module('coloriAppGradientEditor', [])
 		$scope.dialAngle = colorStopRegister.getAngle();
 	};
 
+	$scope.init = function() {
+		// If browsing to a predefined gradient, display it on screen
+		if (typeof $stateParams.permalink != 'undefined') {
+			gradientService.getGradient($stateParams.permalink,
+				function(res){
+					$scope.gradient = res.gradientFound;
+					
+					$scope.comments = [];
+
+					flattenCommentsObject(res.gradientFound.Comments);						
+
+					addExistingColorPickers(res.gradientFound.color_stops, res.gradientFound.angle);
+
+					$scope.colorStops = colorStopRegister.getColorStops();
+
+					colorStopRegister.setAngle(res.gradientFound.angle);
+
+					$scope.dialAngle = res.gradientFound.angle;
+
+					//Set original colorstops state
+					colorStopRegister.setOriginalColorStops(res.gradientFound.color_stops);
+				}, function(err){
+					console.log(err);
+				});
+		
+		} else {
+			// If not displaying a predefined a gradient, display a blank canvas
+			$scope.colorStops = colorStopRegister.getColorStops();
+			// Set record of original colorStop state to compare when a user navigates without saving 
+			colorStopRegister.setOriginalColorStops($scope.colorStops);
+
+		}
+
+	};
+
 	$scope.init();
 
 }])
-.directive('radialGradientControl',['$document', '$window', '$timeout', 
-	function($document, $window, $timeout) {
+.directive('radialGradientControl',['$document', '$window', 
+	function($document, $window) {
   return {
     restrict: 'E',
     scope: {
@@ -350,7 +359,7 @@ angular.module('coloriAppGradientEditor', [])
 
       scope.$watch('ellipsecenter', function(newValue, oldValue){
         updateCenter(newValue);
-      }, true);
+      }, true); //'true' argument allows deep comparison of objects
 
       element.on('mousedown', function(event) {
         // Prevent default dragging of selected content
@@ -423,6 +432,7 @@ angular.module('coloriAppGradientEditor', [])
       }
 
       function mouseup() {
+      	//Deregister event listeners
         $document.off('mousemove', changeEllipseCenter);
         $document.off('mousemove', resizeEllipse);
         $document.off('mousemove', changeEllipseHeight);
