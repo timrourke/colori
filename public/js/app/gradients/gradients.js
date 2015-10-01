@@ -58,6 +58,7 @@ angular.module('coloriAppGradients', [])
 		var sortedColorStops = [];
 		var originalColorStops = [];
 		var angle = 0;
+		var radialAttributes = {};
 		return {
 			increasePickerCount: function() {
 				pickerCount++;
@@ -133,6 +134,12 @@ angular.module('coloriAppGradients', [])
 			},
 			setAngle: function(newAngle) {
 				angle = newAngle;
+			},
+			setRadialAttributes: function(attributes) {
+				radialAttributes = attributes;
+			},
+			getRadialAttributes: function() {
+				return radialAttributes;
 			},
 			sortColorStopsByPositionLeft: function(colorStops) {
 				var sortedColorStops = [];

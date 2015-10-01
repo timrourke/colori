@@ -86,9 +86,13 @@
 
       <css-gradient-string ng-show="showCss" ng-class="{'gradient-string--open': showCss, 'gradient-string--close': !showCss}" cssGradientString="gradientCssString" cssGradientStringAutoprefixed="gradient.body_autoprefixed" showcss="showCss"></css-gradient-string>
 
-      <div ng-show="sortedColorStops.length">
+      <div ng-show="sortedColorStops.length && gradientType == 'linear'">
         <span class="dialIndicator" ng-model="dialAngle" ng-init="dialAngle = 0">{{dialAngle | number :2}}%</span>
         <dial angle="dialAngle"></dial>  
+      </div>
+
+      <div ng-show="sortedColorStops.length && gradientType == 'radial'">
+        <radial-gradient-control angle="radialAttributes.radialAngle" ellipsewidth="radialAttributes.radialWidth" ellipseheight="radialAttributes.radialHeight" ellipsecenter="radialAttributes.radialCenter"></radial-gradient-control>
       </div>      
 
       <div class="gradient"></div>
